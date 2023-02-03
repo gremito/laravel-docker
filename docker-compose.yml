@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  php-apache:
+    container_name: php-apache
+    build:
+      context: ./docker/php
+    ports:
+        - '8080:80'
+    volumes:
+      - ./web:/var/www/laravel
+      - ./docker/apache/default.conf:/etc/apache2/sites-enabled/000-default.conf
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laravel_catch-up
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/mysql/sql:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  redis:
+    image: redis:7.0
+    hostname: redis
+    volumes:
+      - ./docker/redis:/data
+    ports:
+      - '6479:6479'
+    command: redis-server --slaveof redis-master 6379
