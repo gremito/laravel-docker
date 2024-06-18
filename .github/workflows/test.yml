@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -47,8 +51,14 @@ jobs:
       - name: Comment Coverage Summary
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
           header: coverage-summary
           message: |
             ## Coverage Summary
             ${{ steps.coverage-summary.outputs.content }}
+
+      - name: Action Slack Notify
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest # selectable (default: repo,message)
+        if: always() # Pick up events even if the job fails or is canceled.
