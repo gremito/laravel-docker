@@ -30,19 +30,19 @@ jobs:
 
       - name: Cat Test Result
         run: |
-          cat /var/www/laravel/storage/logs/coverage.log
+          cat ./web/storage/logs/coverage.log
         if: ${{ failure() }}
 
       - name: Sed Coverage Report
         run: |
           sed -E "s/"$'\E'"\[([0-9]{1,2}(;[0-9]{1,2})*)?m//g" | \
-          grep "Code Coverage Report:" -A6 /var/www/laravel/storage/logs/coverage.log | sed -e "s/^ *//" | sed -e "s/ *$//" | sed -e "/^ *$/d" > /var/www/laravel/storage/logs/coverage-summary.log
+          grep "Code Coverage Report:" -A6 ./web/storage/logs/coverage.log | sed -e "s/^ *//" | sed -e "s/ *$//" | sed -e "/^ *$/d" > ./web/storage/logs/coverage-summary.log
 
       - name: Read coverage summary
         id: coverage-summary
         uses: juliangruber/read-file-action@v1
         with:
-          path: /var/www/laravel/storage/logs/coverage-summary.log
+          path: ./web/storage/logs/coverage-summary.log
 
       - name: Comment Coverage Summary
         uses: marocchino/sticky-pull-request-comment@v2
