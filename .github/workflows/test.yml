@@ -42,10 +42,9 @@ jobs:
           docker compose exec -T php-apache bash -c "cat storage/logs/coverage.log"
 
       - name: Cat Test Result
-        if: steps.check_skip.outcome == 'success'
+        if: ${{ failure() }}
         run: |
           cat ./web/storage/logs/coverage.log
-        if: ${{ failure() }}
 
       - name: Sed Coverage Report
         if: steps.check_skip.outcome == 'success'
