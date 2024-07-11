@@ -2,7 +2,7 @@ name: "php artisan test"
 
 on:
   pull_request:
-    types: [opened, edited, reopened]
+    types: [opened, synchronize, reopened]
   issue_comment:
     types: [created]
 
