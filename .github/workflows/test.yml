@@ -18,7 +18,7 @@ jobs:
       - name: Check if tests should be skipped
         id: check_skip
         run: |
-          if [ "${{ github.event.issue.pull_request }}" != "" ] && [[ "${{ github.event.comment.body }}" != *"/run-tests"* ]]; then
+          if [ "${{ github.event_name }}" == "issue_comment" ] && [ -n "${{ github.event.issue.pull_request }}" ] && [[ "${{ github.event.comment.body }}" != *"/run-tests"* ]]; then
             echo "Tests should be skipped."
             exit 1
           fi
@@ -42,7 +42,7 @@ jobs:
           docker compose exec -T php-apache bash -c "cat storage/logs/coverage.log"
 
       - name: Cat Test Result
-        if: ${{ failure() }}
+        if: steps.check_skip.outcome != 'success' && ${{ failure() }}
         run: |
           cat ./web/storage/logs/coverage.log
 
