@@ -54,8 +54,11 @@ jobs:
         with:
           header: coverage-summary
           message: |
+            # ref: https://zenn.dev/katzumi/articles/995df5abebc91e312167
             ## Coverage Summary
             ${{ steps.coverage-summary.outputs.content }}
+            ## Coverage Report
+            ${{ steps.coverage-report-urls.outputs.content }}
 
       - name: Action Slack Notify
         uses: 8398a7/action-slack@v3
