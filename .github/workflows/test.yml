@@ -2,7 +2,7 @@ name: "php artisan test"
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, reopened]
   issue_comment:
     types: [created]
 
@@ -53,8 +53,8 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: coverage-summary
+          # ref: https://zenn.dev/katzumi/articles/995df5abebc91e312167
           message: |
-            # ref: https://zenn.dev/katzumi/articles/995df5abebc91e312167
             ## Coverage Summary
             ${{ steps.coverage-summary.outputs.content }}
             ## Coverage Report
