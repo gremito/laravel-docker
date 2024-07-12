@@ -1,6 +1,7 @@
 name: "php artisan test"
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
