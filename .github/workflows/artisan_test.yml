@@ -1,10 +1,6 @@
 name: "php artisan test"
 
-on:
-  pull_request:
-    types: [opened, reopened]
-  issue_comment:
-    types: [created, edited]
+on: workflow_dispatch
 
 env:
   GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
@@ -16,14 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      - name: Check if tests should be skipped
-        id: check_skip
-        run: |
-          if [ "${{ github.event_name }}" == "issue_comment" ] && [ -n "${{ github.event.issue.pull_request }}" ] && [[ "${{ github.event.comment.body }}" != *"/run-tests"* ]]; then
-            echo "Tests should be skipped."
-            exit 1
-          fi
 
       - name: Checkout code
         uses: actions/checkout@v2
@@ -64,7 +52,6 @@ jobs:
           done
 
       - name: dokcer-compose Laravel Init
-        if: steps.check_skip.outcome == 'success'
         run: |
           docker compose up -d
           docker compose exec -T php-apache bash -c "composer install"
@@ -74,7 +61,6 @@ jobs:
           docker compose exec -T php-apache bash -c "sleep 200"
 
       - name: Exec Test
-        if: steps.check_skip.outcome == 'success'
         run: |
           # docker compose exec -T php-apache bash -c "phpdbg -qrr ./vendor/bin/phpunit --coverage-text --colors=never > storage/logs/coverage.log"
           # docker compose exec -T php-apache bash -c "cat storage/logs/coverage.log"
@@ -92,20 +78,17 @@ jobs:
           cat ./web/storage/logs/coverage.log
 
       - name: Sed Coverage Report
-        if: steps.check_skip.outcome == 'success'
         run: |
           sed -E "s/"$'\E'"\[([0-9]{1,2}(;[0-9]{1,2})*)?m//g" | \
           grep "Code Coverage Report:" -A6 ./web/storage/logs/coverage.log | sed -e "s/^ *//" | sed -e "s/ *$//" | sed -e "/^ *$/d" > ./web/storage/logs/coverage-summary.log
 
       - name: Read coverage summary
-        if: steps.check_skip.outcome == 'success'
         id: coverage-summary
         uses: juliangruber/read-file-action@v1
         with:
           path: ./web/storage/logs/coverage-summary.log
 
       - name: Comment Coverage Summary
-        if: steps.check_skip.outcome == 'success'
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: coverage-summary
