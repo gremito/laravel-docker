@@ -92,24 +92,25 @@ jobs:
         with:
           payload: |
             {
-              "text": "Laravel テストが完了しました。",
-              "attachments": [
+              "text": ":github: ビルド結果: ${{ job.status }}\n\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
+              "blocks": [
                 {
-                  "color": "#36a64f",
-                  "title": "テスト結果",
-                  "text": "テストは正常に完了しました。",
-                  "fields": [
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ":github: ビルド結果: ${{ job.status }}\n\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+                  }
+                },
+                {
+                  "type": "context",
+                  "elements": [
                     {
-                      "title": "ブランチ",
-                      "value": "${{ github.ref }}",
-                      "short": true
-                    },
-                    {
-                      "title": "コミット",
-                      "value": "${{ github.sha }}",
-                      "short": true
+                      "type": "mrkdwn",
+                      "text": "Author: <https://github.com/${{ github.event.sender.login }}|@${{ github.event.sender.login }}>"
                     }
                   ]
                 }
               ]
             }
+        env:
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
