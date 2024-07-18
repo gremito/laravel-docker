@@ -65,7 +65,7 @@ jobs:
 
       - name: Exec Test
         run: |
-          docker compose exec -T php-apache bash -c "phpdbg -qrr ./vendor/bin/phpunit --coverage-text --colors=never > storage/logs/coverage.log"
+          docker compose exec -T php-apache bash -c "php artisan test --coverage-text --colors=never > storage/logs/coverage.log"
           docker compose exec -T php-apache bash -c "cat storage/logs/coverage.log"
 
       - name: Shut down Docker Compose
