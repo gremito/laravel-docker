@@ -94,28 +94,28 @@ jobs:
       - name: Send GitHub Action trigger data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.26.0
-        with:
-          payload: |
-            {
-              "text": "*Laravel Test Results*",
-              "attachments": [
-                {
-                  "fallback": "Test results",
-                  "color": "#36a64f",
-                  "title": "Test Coverage Report",
-                  "text": "${{ env.COVERAGE_LOG }}",
-                  "fields": [
-                    {
-                      "title": "Branch",
-                      "value": "${{ github.ref }}",
-                      "short": true
-                    },
-                    {
-                      "title": "Commit",
-                      "value": "${{ github.sha }}",
-                      "short": true
-                    }
-                  ]
-                }
-              ]
-            }
+        # with:
+        #   payload: |
+        #     {
+        #       "text": "*Laravel Test Results*",
+        #       "attachments": [
+        #         {
+        #           "fallback": "Test results",
+        #           "color": "#36a64f",
+        #           "title": "Test Coverage Report",
+        #           "text": "${{ env.COVERAGE_LOG }}",
+        #           "fields": [
+        #             {
+        #               "title": "Branch",
+        #               "value": "${{ github.ref }}",
+        #               "short": true
+        #             },
+        #             {
+        #               "title": "Commit",
+        #               "value": "${{ github.sha }}",
+        #               "short": true
+        #             }
+        #           ]
+        #         }
+        #       ]
+        #     }
