@@ -79,6 +79,10 @@ jobs:
           name: coverage-report
           path: ./storage/logs/coverage.log
 
+      - name: Read coverage log
+        id: read_log
+        run: echo "COVERAGE_LOG=$(cat ./storage/logs/coverage.log)" >> $GITHUB_ENV
+
       # - name: Action Slack Notify
       #   # Pick up events even if the job fails or is canceled.
       #   if: always()
@@ -87,10 +91,11 @@ jobs:
       #     status: ${{ job.status }}
       #     fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest # selectable (default: repo,message)
 
-      - name: Notify Slack
-        uses: slackapi/slack-github-action@v1.23.0
+      - name: Send GitHub Action trigger data to Slack workflow
+        id: slack
+        uses: slackapi/slack-github-action@v1.26.0
         with:
-          slack-message: |
+          payload: |
             {
               "text": "*Laravel Test Results*",
               "attachments": [
@@ -98,7 +103,7 @@ jobs:
                   "fallback": "Test results",
                   "color": "#36a64f",
                   "title": "Test Coverage Report",
-                  "text": "Test results with coverage information.",
+                  "text": "${{ env.COVERAGE_LOG }}",
                   "fields": [
                     {
                       "title": "Branch",
