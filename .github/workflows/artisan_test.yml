@@ -67,45 +67,51 @@ jobs:
         run: |
           # docker compose exec -T php-apache bash -c "phpdbg -qrr ./vendor/bin/phpunit --coverage-text --colors=never > storage/logs/coverage.log"
           # docker compose exec -T php-apache bash -c "cat storage/logs/coverage.log"
-          docker compose exec -T php-apache bash -c "php artisan test --coverage-text --colors=never > storage/logs/coverage.log"
-          docker compose exec -T php-apache bash -c "cat storage/logs/coverage.log"
+          docker compose exec -T php-apache bash -c "php artisan test --coverage"
 
       - name: Shut down Docker Compose
         if: always()
         run: |
           docker compose down
 
-      - name: Cat Test Result
-        if: steps.check_skip.outcome != 'success' && ${{ failure() }}
-        run: |
-          cat ./web/storage/logs/coverage.log
-
-      - name: Sed Coverage Report
-        run: |
-          sed -E "s/"$'\E'"\[([0-9]{1,2}(;[0-9]{1,2})*)?m//g" | \
-          grep "Code Coverage Report:" -A6 ./web/storage/logs/coverage.log | sed -e "s/^ *//" | sed -e "s/ *$//" | sed -e "/^ *$/d" > ./web/storage/logs/coverage-summary.log
-
-      - name: Read coverage summary
-        id: coverage-summary
-        uses: juliangruber/read-file-action@v1
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v2
         with:
-          path: ./web/storage/logs/coverage-summary.log
+          name: coverage-report
+          path: coverage/
 
-      - name: Comment Coverage Summary
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          header: coverage-summary
-          # ref: https://zenn.dev/katzumi/articles/995df5abebc91e312167
-          message: |
-            ## Coverage Summary
-            ${{ steps.coverage-summary.outputs.content }}
-            ## Coverage Report
-            ${{ steps.coverage-report-urls.outputs.content }}
+      # - name: Action Slack Notify
+      #   # Pick up events even if the job fails or is canceled.
+      #   if: always()
+      #   uses: 8398a7/action-slack@v3
+      #   with:
+      #     status: ${{ job.status }}
+      #     fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest # selectable (default: repo,message)
 
-      - name: Action Slack Notify
-        # Pick up events even if the job fails or is canceled.
-        if: always()
-        uses: 8398a7/action-slack@v3
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v1.23.0
         with:
-          status: ${{ job.status }}
-          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest # selectable (default: repo,message)
+          slack-message: |
+            {
+              "text": "*Laravel Test Results*",
+              "attachments": [
+                {
+                  "fallback": "Test results",
+                  "color": "#36a64f",
+                  "title": "Test Coverage Report",
+                  "text": "Test results with coverage information.",
+                  "fields": [
+                    {
+                      "title": "Branch",
+                      "value": "${{ github.ref }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Commit",
+                      "value": "${{ github.sha }}",
+                      "short": true
+                    }
+                  ]
+                }
+              ]
+            }
