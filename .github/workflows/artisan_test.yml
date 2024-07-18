@@ -65,8 +65,7 @@ jobs:
 
       - name: Exec Test
         run: |
-          docker compose exec -T php-apache bash -c "php artisan test --coverage-text --colors=never > storage/logs/coverage.log"
-          docker compose exec -T php-apache bash -c "cat storage/logs/coverage.log"
+          docker compose exec -T php-apache bash -c "php artisan test --stop-on-failure --coverage"
 
       - name: Shut down Docker Compose
         if: always()
@@ -77,11 +76,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: coverage-report
-          path: ./storage/logs/coverage.log
-
-      - name: Read coverage log
-        id: read_log
-        run: echo "COVERAGE_LOG=$(cat ./storage/logs/coverage.log)" >> $GITHUB_ENV
+          path: ./web/coverage/coverage.xml
 
       # - name: Action Slack Notify
       #   # Pick up events even if the job fails or is canceled.
@@ -94,28 +89,27 @@ jobs:
       - name: Send GitHub Action trigger data to Slack workflow
         id: slack
         uses: slackapi/slack-github-action@v1.26.0
-        # with:
-        #   payload: |
-        #     {
-        #       "text": "*Laravel Test Results*",
-        #       "attachments": [
-        #         {
-        #           "fallback": "Test results",
-        #           "color": "#36a64f",
-        #           "title": "Test Coverage Report",
-        #           "text": "${{ env.COVERAGE_LOG }}",
-        #           "fields": [
-        #             {
-        #               "title": "Branch",
-        #               "value": "${{ github.ref }}",
-        #               "short": true
-        #             },
-        #             {
-        #               "title": "Commit",
-        #               "value": "${{ github.sha }}",
-        #               "short": true
-        #             }
-        #           ]
-        #         }
-        #       ]
-        #     }
+        with:
+          payload: |
+            {
+              "text": "Laravel テストが完了しました。",
+              "attachments": [
+                {
+                  "color": "#36a64f",
+                  "title": "テスト結果",
+                  "text": "テストは正常に完了しました。",
+                  "fields": [
+                    {
+                      "title": "ブランチ",
+                      "value": "${{ github.ref }}",
+                      "short": true
+                    },
+                    {
+                      "title": "コミット",
+                      "value": "${{ github.sha }}",
+                      "short": true
+                    }
+                  ]
+                }
+              ]
+            }

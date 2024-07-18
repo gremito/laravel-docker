@@ -17,6 +17,10 @@ RUN docker-php-ext-install \
             pdo_mysql \
             mysqli
 
+RUN pecl install xdebug
+
+COPY ./php.ini /usr/local/etc/php/
+
 WORKDIR /var/www/laravel
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
