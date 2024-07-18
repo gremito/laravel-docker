@@ -14,6 +14,7 @@ jobs:
 
       - uses: google-github-actions/release-please-action@v3
         with:
-          token: ${{ secrets.GIT_HUB_TOKEN }}
           release-type: github
           path: ./api
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
