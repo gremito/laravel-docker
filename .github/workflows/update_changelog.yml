@@ -11,10 +11,13 @@ jobs:
       - name: コードのチェックアウト
         uses: actions/checkout@v2
 
+      - name: リモートブランチのフェッチ
+        run: |
+          git fetch --all
+
       - name: 特定のディレクトリでの変更を確認
         id: check_changes
         run: |
-          git fetch origin develop
           git diff --name-only origin/develop...HEAD > changed_files.txt
           grep "^web/" changed_files.txt > relevant_changes.txt || true
           if [ -s relevant_changes.txt ]; then
