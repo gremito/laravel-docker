@@ -14,23 +14,48 @@ jobs:
       - name: 特定のディレクトリでの変更を確認
         id: check_changes
         run: |
-          git fetch origin main
+          git fetch origin develop
           git diff --name-only origin/develop...HEAD > changed_files.txt
-          if grep -q "web/" changed_files.txt; then
+          grep "^web/" changed_files.txt > relevant_changes.txt || true
+          if [ -s relevant_changes.txt ]; then
             echo "特定のディレクトリに変更が検出されました"
             echo "changes=true" >> $GITHUB_ENV
+            git log --format="%H" origin/develop...HEAD -- $(cat relevant_changes.txt) > commit_hashes.txt
           else
             echo "特定のディレクトリに変更が検出されませんでした"
             echo "changes=false" >> $GITHUB_ENV
+          fi
+
+      - name: プルリクエスト情報の取得
+        if: env.changes == 'true'
+        id: get_pr_info
+        run: |
+          PR_INFO=""
+          while IFS= read -r commit_hash; do
+            PR=$(gh pr list --state merged --search "$commit_hash" --json title,number --jq '.[] | "\(.title) (#\(.number))"')
+            if [ -n "$PR" ];then
+              PR_INFO="$PR_INFO\n- $PR"
+            fi
+          done < commit_hashes.txt
+          echo "$PR_INFO" > pr_info.txt
+
+      - name: 新しいブランチの作成
+        if: env.changes == 'true'
+        run: |
+          BRANCH_NAME=update-changelog-$(date +'%Y%m%d%H%M%S')
+          git checkout -b $BRANCH_NAME
 
       - name: CHANGELOGに追記
         if: env.changes == 'true'
         run: |
           RELEASE_DATE=$(date +'%Y-%m-%d')
-          echo "## $RELEASE_DATE" >> CHANGELOG.md
-          for PR in $(jq -r '.[] | "\(.title) (\(.number))"' <<< "$(gh pr list --json title,number)"); do
-            echo "- $PR" >> CHANGELOG.md
-          done
+          head -n 5 CHANGELOG.md > changelog_head.txt
+          tail -n +6 CHANGELOG.md > changelog_tail.txt
+          echo "## $RELEASE_DATE" > new_changelog.txt
+          cat pr_info.txt >> new_changelog.txt
+          echo "" >> new_changelog.txt
+          cat changelog_tail.txt >> new_changelog.txt
+          cat changelog_head.txt new_changelog.txt > CHANGELOG.md
 
       - name: 変更をコミットしてプッシュ
         if: env.changes == 'true'
@@ -46,4 +71,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr create --title "Update CHANGELOG for $RELEASE_DATE" --body "This PR updates the CHANGELOG with changes from $RELEASE_DATE" --base main
+          gh pr create --title "Update CHANGELOG for $RELEASE_DATE" --body "This PR updates the CHANGELOG with changes from $RELEASE_DATE" --base main --head $BRANCH_NAME
