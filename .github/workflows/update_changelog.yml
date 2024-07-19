@@ -1,0 +1,49 @@
+name: Update CHANGELOG
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update_changelog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: コードのチェックアウト
+        uses: actions/checkout@v2
+
+      - name: 特定のディレクトリでの変更を確認
+        id: check_changes
+        run: |
+          git fetch origin main
+          git diff --name-only origin/main...HEAD > changed_files.txt
+          if grep -q "specific-directory/" changed_files.txt; then
+            echo "特定のディレクトリに変更が検出されました"
+            echo "changes=true" >> $GITHUB_ENV
+          else
+            echo "特定のディレクトリに変更が検出されませんでした"
+            echo "changes=false" >> $GITHUB_ENV
+
+      - name: CHANGELOGに追記
+        if: env.changes == 'true'
+        run: |
+          RELEASE_DATE=$(date +'%Y-%m-%d')
+          echo "## $RELEASE_DATE" >> CHANGELOG.md
+          for PR in $(jq -r '.[] | "\(.title) (\(.number))"' <<< "$(gh pr list --json title,number)"); do
+            echo "- $PR" >> CHANGELOG.md
+          done
+
+      - name: 変更をコミットしてプッシュ
+        if: env.changes == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "Update CHANGELOG for $RELEASE_DATE"
+          git push origin HEAD
+
+      - name: 新しいPRを作成
+        if: env.changes == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create --title "Update CHANGELOG for $RELEASE_DATE" --body "This PR updates the CHANGELOG with changes from $RELEASE_DATE" --base main
