@@ -16,7 +16,7 @@ jobs:
         run: |
           git fetch origin main
           git diff --name-only origin/main...HEAD > changed_files.txt
-          if grep -q "specific-directory/" changed_files.txt; then
+          if grep -q "web/" changed_files.txt; then
             echo "特定のディレクトリに変更が検出されました"
             echo "changes=true" >> $GITHUB_ENV
           else
