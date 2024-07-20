@@ -40,6 +40,8 @@ jobs:
             fi
           done < commit_hashes.txt
           echo "$PR_INFO" > pr_info.txt
+        env:
+          GH_TOKEN: ${{ secrets.GIT_HUB_TOKEN  }}
 
       - name: 新しいブランチの作成
         if: env.changes == 'true'
