@@ -52,21 +52,26 @@ jobs:
       - name: CHANGELOGに追記
         if: env.changes == 'true'
         run: |
+          cd ./web
+          if [ ! -e CHANGELOG.md ]; then
+            touch CHANGELOG.md
+          fi
           RELEASE_DATE=$(date +'%Y-%m-%d')
           head -n 5 CHANGELOG.md > changelog_head.txt
           tail -n +6 CHANGELOG.md > changelog_tail.txt
           echo "## $RELEASE_DATE" > new_changelog.txt
-          cat pr_info.txt >> new_changelog.txt
+          cat ../pr_info.txt >> new_changelog.txt
           echo "" >> new_changelog.txt
           cat changelog_tail.txt >> new_changelog.txt
           cat changelog_head.txt new_changelog.txt > CHANGELOG.md
+          cd ../
 
       - name: 変更をコミットしてプッシュ
         if: env.changes == 'true'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add CHANGELOG.md
+          git add ./web/CHANGELOG.md
           git commit -m "Update CHANGELOG for $RELEASE_DATE"
           git push origin HEAD
 
