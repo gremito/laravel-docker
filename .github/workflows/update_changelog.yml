@@ -47,6 +47,7 @@ jobs:
         if: env.changes == 'true'
         run: |
           BRANCH_NAME=update-changelog-$(date +'%Y%m%d%H%M%S')
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
           git checkout -b $BRANCH_NAME
 
       - name: CHANGELOGに追記
@@ -80,4 +81,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
         run: |
-          gh pr create --title "Update CHANGELOG for $RELEASE_DATE" --body "This PR updates the CHANGELOG with changes from $RELEASE_DATE" --base main --head $BRANCH_NAME
+          gh pr create --title "Update CHANGELOG for $RELEASE_DATE" --body "This PR updates the CHANGELOG with changes from $RELEASE_DATE" --base main --head ${{ env.BRANCH_NAME }}
