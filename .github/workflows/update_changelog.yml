@@ -16,13 +16,13 @@ jobs:
       - name: 特定のディレクトリでの変更を確認
         id: check_changes
         run: |
-          git fetch origin develop
-          git diff --name-only origin/develop...HEAD > changed_files.txt
+          git fetch origin main
+          git diff --name-only origin/main...HEAD > changed_files.txt
           grep "^web/" changed_files.txt > relevant_changes.txt || true
           if [ -s relevant_changes.txt ]; then
             echo "特定のディレクトリに変更が検出されました"
             echo "changes=true" >> $GITHUB_ENV
-            git log --format="%H" origin/develop...HEAD -- $(cat relevant_changes.txt) > commit_hashes.txt
+            git log --format="%H" origin/main...HEAD -- $(cat relevant_changes.txt) > commit_hashes.txt
           else
             echo "特定のディレクトリに変更が検出されませんでした"
             echo "changes=false" >> $GITHUB_ENV
