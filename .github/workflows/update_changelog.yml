@@ -78,6 +78,6 @@ jobs:
       - name: 新しいPRを作成
         if: env.changes == 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
         run: |
           gh pr create --title "Update CHANGELOG for $RELEASE_DATE" --body "This PR updates the CHANGELOG with changes from $RELEASE_DATE" --base main --head $BRANCH_NAME
