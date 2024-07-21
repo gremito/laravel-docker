@@ -32,14 +32,12 @@ jobs:
         if: env.changes == 'true'
         id: get_pr_info
         run: |
-          PR_INFO=""
           while IFS= read -r commit_hash; do
             PR=$(gh pr list --state merged --search "$commit_hash" --json title,number --jq '.[] | "\(.title) (#\(.number))"')
             if [ -n "$PR" ];then
-              PR_INFO="$PR_INFO\n- $PR"
+              echo "- $PR" > pr_info.txt
             fi
           done < commit_hashes.txt
-          echo "$PR_INFO" > pr_info.txt
         env:
           GH_TOKEN: ${{ secrets.GIT_HUB_TOKEN  }}
 
