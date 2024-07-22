@@ -22,7 +22,8 @@ jobs:
           if [ -s relevant_changes.txt ]; then
             echo "特定のディレクトリに変更が検出されました"
             echo "changes=true" >> $GITHUB_ENV
-            git log --format="%H" origin/main...HEAD -- $(cat relevant_changes.txt) > commit_hashes.txt
+            # git log --format="%H" origin/main...HEAD -- $(cat relevant_changes.txt) > commit_hashes.txt
+            git log --format="%H" -- $(cat relevant_changes.txt) > commit_hashes.txt
           else
             echo "特定のディレクトリに変更が検出されませんでした"
             echo "changes=false" >> $GITHUB_ENV
@@ -32,11 +33,16 @@ jobs:
         if: env.changes == 'true'
         id: get_pr_info
         run: |
+          touch pr_info.txt
           while IFS= read -r commit_hash; do
             PR=$(gh pr list --state merged --search "$commit_hash" --json title,number --jq '.[] | "\(.title) (#\(.number))"')
-            if [ -n "$PR" ];then
-              echo "- $PR" > pr_info.txt
+            if [ ! -n "$PR" ]; then
+              continue
             fi
+            if grep -q "$PR" "pr_info.txt"; then
+              continue
+            fi
+            echo "- $PR" >> pr_info.txt
           done < commit_hashes.txt
         env:
           GH_TOKEN: ${{ secrets.GIT_HUB_TOKEN  }}
