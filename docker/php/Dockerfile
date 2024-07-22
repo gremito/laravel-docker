@@ -7,8 +7,17 @@ RUN apt install -y \
             libicu-dev \
             libpq-dev \
             libzip-dev \
+            wget \
             zip \
             zlib1g-dev
+
+RUN wget https://ftp.gnu.org/gnu/sed/sed-4.8.tar.xz \
+            && tar -Jxvf sed-4.8.tar.xz \
+            && cd sed-4.8 \
+            && ./configure \
+            && make \
+            && make install \
+            && cd ../
 
 RUN docker-php-ext-install \
             intl \
