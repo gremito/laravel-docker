@@ -18,4 +18,11 @@ class ExampleTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function test_the_application_returns_a_not_found_response()
+    {
+        $response = $this->get('/admin');
+
+        $response->assertStatus(404);
+    }
 }
