@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened]
     paths:
-      - './libs/**'
+      - 'libs/**'
   workflow_dispatch:
     inputs:
       pr_title:
@@ -34,9 +34,9 @@ jobs:
         run: |
           if [[ "${{ github.event_name }}" == 'workflow_dispatch' ]]; then
             CHANGED_FILES=$(git diff --name-only origin/main)
-            PROJECTS=$(echo "$CHANGED_FILES" | grep -o '^./libs/[^/]*/' | sort | uniq)
+            PROJECTS=$(echo "$CHANGED_FILES" | grep -o '^libs/[^/]*/' | sort | uniq)
           else
-            PROJECTS=$(echo "${{ github.event.pull_request.changed_files }}" | grep -o '^./libs/[^/]*/' | sort | uniq)
+            PROJECTS=$(echo "${{ github.event.pull_request.changed_files }}" | grep -o '^libs/[^/]*/' | sort | uniq)
           fi
           echo "Projects: $PROJECTS"
           echo "::set-output name=projects::$PROJECTS"
