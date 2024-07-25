@@ -47,7 +47,7 @@ jobs:
             PROJECTS=$(echo ${ALL_CHANGED_FILES} | grep -o '^libs/[^/]*/' | sort | uniq)
           fi
           echo "Projects: $PROJECTS"
-          echo "{PROJECTS}={$PROJECTS}" >> $GITHUB_OUTPUT
+          echo "PROJECTS=${PROJECTS}" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Update CHANGELOG for each project
