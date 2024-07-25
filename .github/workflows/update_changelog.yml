@@ -113,4 +113,5 @@ jobs:
       - name: Push changes
         if: ${{ github.event_name != 'workflow_dispatch' && steps.get_projects.outputs.projects != '' }}
         run: |
-          git push origin HEAD:refs/pull/${{ github.event.pull_request.number }}/head
+          BRANCH=${{ github.event.pull_request.head.ref }}
+          git push origin HEAD:$BRANCH
