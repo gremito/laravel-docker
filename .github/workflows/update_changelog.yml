@@ -55,26 +55,31 @@ jobs:
               PR_TITLE="${{ inputs.pr_title }}"
               PR_NUMBER="${{ inputs.pr_number }}"
             fi
-            CHANGELOG="${PROJECT}CHANGELOG"
-            DATE=$(date +'%Y-%m-%d')
-            ADD_CHANGE_LOG="- $PR_TITLE (#$PR_NUMBER)"
+            echo "PR_TITLE: ${PR_TITLE}"
+            echo "PR_NUMBER: ${PR_NUMBER}"
 
-            if grep -q "^$ADD_CHANGE_LOG" $CHANGELOG; then
+            CHANGELOG_FILE="${PROJECT}CHANGELOGS.md"
+            ADD_CHANGE_LOG="- $PR_TITLE (#$PR_NUMBER)"
+            echo "CHANGELOG_FILE: ${CHANGELOG_FILE}"
+            echo "ADD_CHANGE_LOG: ${ADD_CHANGE_LOG}"
+
+            if grep -q "^$ADD_CHANGE_LOG" $CHANGELOG_FILE; then
               continue
             fi
 
-            if grep -q "^## $DATE" $CHANGELOG; then
+            DATE=$(date +'%Y-%m-%d')
+            if grep -q "^## $DATE" $CHANGELOG_FILE; then
               # Insert the PR information below the found date line
-              LINE_NUM=$(grep -n "^## $DATE" $CHANGELOG | cut -d: -f1)
-              sed -i "$((LINE_NUM + 1)) i\$ADD_CHANGE_LOG" $CHANGELOG
+              LINE_NUM=$(grep -n "^## $DATE" $CHANGELOG_FILE | cut -d: -f1)
+              sed -i "$((LINE_NUM + 1)) i\$ADD_CHANGE_LOG" $CHANGELOG_FILE
             else
               # Add the date and PR information at the 6th line
-              sed -i "6 i\## $DATE\n$ADD_CHANGE_LOG" $CHANGELOG
+              sed -i "6 i\## $DATE\n$ADD_CHANGE_LOG" $CHANGELOG_FILE
             fi
 
             # Commit changes if not manually triggered
             if [[ "${{ github.event_name }}" != 'workflow_dispatch' ]]; then
-              git add $CHANGELOG
+              git add $CHANGELOG_FILE
               git commit -m "Update CHANGELOG for PR #${{ github.event.pull_request.number }} in ${PROJECT}"
             fi
           done
