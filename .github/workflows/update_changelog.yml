@@ -33,7 +33,7 @@ jobs:
         id: get_projects
         run: |
           if [[ "${{ github.event_name }}" == 'workflow_dispatch' ]]; then
-            CHANGED_FILES=$(git diff --name-only origin/main)
+            CHANGED_FILES=$(git diff --name-only origin/develop)
             PROJECTS=$(echo "$CHANGED_FILES" | grep -o '^libs/[^/]*/' | sort | uniq)
           else
             PROJECTS=$(echo "${{ github.event.pull_request.changed_files }}" | grep -o '^libs/[^/]*/' | sort | uniq)
