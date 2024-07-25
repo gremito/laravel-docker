@@ -89,8 +89,7 @@ jobs:
               LINE_NUM=$(grep -n "^## $DATE" $CHANGELOG_FILE | cut -d: -f1)
               LINE_NUM=$((LINE_NUM + 1))
             else
-              ADD_CHANGE_LOG="
-          ## ${DATE}
+              ADD_CHANGE_LOG="## ${DATE}
           ${ADD_CHANGE_LOG}
           "
             fi
