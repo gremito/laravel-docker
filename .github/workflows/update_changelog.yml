@@ -69,9 +69,9 @@ jobs:
               echo "Create CHANGELOGS.md"
               echo "# CHANGELOGS
 
-            本ディレクトリ以下の修正について記載します。
-            マージ後に、関連するPRを記載してきます。
-            " > $CHANGELOG_FILE
+          本ディレクトリ以下の修正について記載します。
+          マージ後に、関連するPRを記載してきます。
+          " > $CHANGELOG_FILE
             fi
 
             ADD_CHANGE_LOG="- $PR_TITLE (#$PR_NUMBER)"
@@ -86,12 +86,13 @@ jobs:
             DATE=$(date +'%Y-%m-%d')
             LINE_NUM=6
             if grep -q "^## $DATE" $CHANGELOG_FILE; then
-                LINE_NUM=$(grep -n "^## $DATE" $CHANGELOG_FILE | cut -d: -f1)
-                LINE_NUM=$((LINE_NUM + 1))
+              LINE_NUM=$(grep -n "^## $DATE" $CHANGELOG_FILE | cut -d: -f1)
+              LINE_NUM=$((LINE_NUM + 1))
             else
-                ADD_CHANGE_LOG="
-            ## ${DATE}
-            ${ADD_CHANGE_LOG}"
+              ADD_CHANGE_LOG="
+          ## ${DATE}
+          ${ADD_CHANGE_LOG}
+          "
             fi
 
             TEMP_FILE=$(mktemp)
