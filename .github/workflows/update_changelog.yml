@@ -31,14 +31,20 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+
       - name: Get list of modified projects
         id: get_projects
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         run: |
           if [[ "${{ github.event_name }}" == 'workflow_dispatch' ]]; then
             CHANGED_FILES=$(git diff --name-only origin/develop)
             PROJECTS=$(echo "$CHANGED_FILES" | grep -o '^libs/[^/]*/' | sort | uniq)
           else
-            PROJECTS=$(echo "${{ github.event.pull_request.changed_files }}" | grep -o '^libs/[^/]*/' | sort | uniq)
+            PROJECTS=$(echo ${ALL_CHANGED_FILES} | grep -o '^libs/[^/]*/' | sort | uniq)
           fi
           echo "Projects: $PROJECTS"
           echo "::set-output name=projects::$PROJECTS"
