@@ -47,7 +47,7 @@ jobs:
             PROJECTS=$(echo ${ALL_CHANGED_FILES} | grep -o '^libs/[^/]*/' | sort | uniq)
           fi
           echo "Projects: $PROJECTS"
-          echo "::set-output name=projects::$PROJECTS"
+          echo "{PROJECTS}={$PROJECTS}" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Update CHANGELOG for each project
@@ -75,18 +75,18 @@ jobs:
 
             DATE=$(date +'%Y-%m-%d')
             if grep -q "^## $DATE" $CHANGELOG_FILE; then
-              # Insert the PR information below the found date line
               LINE_NUM=$(grep -n "^## $DATE" $CHANGELOG_FILE | cut -d: -f1)
               sed -i "$((LINE_NUM + 1)) i\$ADD_CHANGE_LOG" $CHANGELOG_FILE
             else
-              # Add the date and PR information at the 6th line
               sed -i "6 i\## $DATE\n$ADD_CHANGE_LOG" $CHANGELOG_FILE
             fi
 
             # Commit changes if not manually triggered
             if [[ "${{ github.event_name }}" != 'workflow_dispatch' ]]; then
+              git status
+              git diff
               git add $CHANGELOG_FILE
-              git commit -m "Update CHANGELOG for PR #${{ github.event.pull_request.number }} in ${PROJECT}"
+              git commit -m "Update CHANGELOG for PR #${PR_NUMBER} in ${PROJECT}"
             fi
           done
         shell: bash
