@@ -18,8 +18,8 @@ on:
 
 jobs:
   update-changelog:
+    if: ${{ github.head_ref != 'main' && github.head_ref != 'develop' }}
     runs-on: ubuntu-latest
-
     steps:
       - name: コードのチェックアウト
         uses: actions/checkout@v2
@@ -114,13 +114,3 @@ jobs:
         run: |
           BRANCH=${{ github.event.pull_request.head.ref }}
           git push origin HEAD:$BRANCH
-
-  build:
-    needs: update-changelog
-    if: ${{ needs.check-branch.outputs.branch != 'main' && needs.check-branch.outputs.branch != 'develop' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: コードのチェックアウト
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
