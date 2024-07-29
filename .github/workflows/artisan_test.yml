@@ -3,6 +3,8 @@ name: "php artisan test"
 on:
   pull_request:
     types: [opened, reopened]
+  check_suite:
+    types: [requested]
   workflow_dispatch:
 
 env:
