@@ -25,7 +25,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-
       - name: Set up Git
         run: |
           git config --global user.name "github-actions[bot]"
@@ -115,3 +114,13 @@ jobs:
         run: |
           BRANCH=${{ github.event.pull_request.head.ref }}
           git push origin HEAD:$BRANCH
+
+  build:
+    needs: update-changelog
+    if: ${{ needs.check-branch.outputs.branch != 'main' && needs.check-branch.outputs.branch != 'develop' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: コードのチェックアウト
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
