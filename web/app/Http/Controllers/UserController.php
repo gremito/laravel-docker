@@ -9,7 +9,6 @@ class UserController extends Controller
 {
     public function index()
     {
-        \Log::debug("Show UserController Index");
         $users = User::all();
         return view('users.index', compact('users'));
     }
