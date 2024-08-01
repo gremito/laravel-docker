@@ -1,3 +1,3 @@
 #!/bin/bash
 
-curl https://zipcloud.ibsnet.co.jp/api/search?zipcode=1500001
+curl https://zipcloud.ibsnet.co.jp/api/search?zipcode=$1

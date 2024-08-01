@@ -4,7 +4,7 @@ import json
 import pytest
 
 def test_zipcloud_request():
-    script_path = "./get_postal_service_info.sh"
+    script_path = "./get_postal_service_info.sh 1500001"
     
     result = subprocess.run([script_path], capture_output=True, text=True)
     
