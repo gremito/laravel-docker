@@ -20,11 +20,13 @@ jobs:
   update-changelog:
     if: ${{ github.head_ref != 'main' && github.head_ref != 'develop' }}
     runs-on: ubuntu-latest
+
     steps:
       - name: コードのチェックアウト
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+
       - name: Set up Git
         run: |
           git config --global user.name "github-actions[bot]"
@@ -39,6 +41,7 @@ jobs:
         env:
           ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         run: |
+          # 変更情報取得
           if [[ "${{ github.event_name }}" == 'workflow_dispatch' ]]; then
             CHANGED_FILES=$(git diff --name-only origin/develop)
             PROJECTS=$(echo "$CHANGED_FILES" | grep -o '^libs/[^/]*/' | sort | uniq)
@@ -52,6 +55,12 @@ jobs:
       - name: Update CHANGELOG for each project
         if: ${{ steps.get_projects.outputs.projects != '' }}
         run: |
+          escape_regex() {
+              local input="$1"
+              echo "$input" | sed 's/[]\.[*^$(){}+?|]/\\&/g'
+          }
+
+          # 変更情報をもとにPR情報を取得して`CHANGELOGS.md`に追記
           for PROJECT in ${{ steps.get_projects.outputs.projects }}; do
             if [[ "${{ github.event_name }}" != 'workflow_dispatch' ]]; then
               PR_TITLE="${{ github.event.pull_request.title }}"
@@ -73,16 +82,18 @@ jobs:
           " > $CHANGELOG_FILE
             fi
 
-            ADD_CHANGE_LOG="- $PR_TITLE (#$PR_NUMBER)"
+            ADD_CHANGE_LOG="- $PR_TITLE #$PR_NUMBER"
             echo "CHANGELOG_FILE: ${CHANGELOG_FILE}"
             echo "ADD_CHANGE_LOG: ${ADD_CHANGE_LOG}"
 
-            if grep -q "^$ADD_CHANGE_LOG" $CHANGELOG_FILE; then
-              echo "すでに記載されているためスキップ"
+            ESCAPED_SEARCH_STRING=$(escape_regex "$ADD_CHANGE_LOG")
+
+            if grep -n "^$ESCAPED_SEARCH_STRING" $CHANGELOG_FILE; then
+              echo "すでに「${ADD_CHANGE_LOG}」が記載されているためスキップ"
               continue
             fi
 
-            DATE=$(date +'%Y-%m-%d')
+            DATE=$(date +'%Y/%m/%d')
             LINE_NUM=6
             if grep -q "^## $DATE" $CHANGELOG_FILE; then
               LINE_NUM=$(grep -n "^## $DATE" $CHANGELOG_FILE | cut -d: -f1)
@@ -112,5 +123,6 @@ jobs:
       - name: Push changes
         if: ${{ github.event_name != 'workflow_dispatch' && steps.get_projects.outputs.projects != '' }}
         run: |
+          # PR情報からマージもとのブランチを取得して`CHANGELOGS.md`のコミットをプッシュ
           BRANCH=${{ github.event.pull_request.head.ref }}
           git push origin HEAD:$BRANCH
