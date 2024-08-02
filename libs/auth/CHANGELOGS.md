@@ -4,6 +4,7 @@
 マージ後に、関連するPRを記載してきます。
 
 ## 2024/08/02
+- [Update] Auth & Postal #16
 - [Add] GitHub Auth #14
 
 ## 2024-07-25
