@@ -18,7 +18,7 @@ on:
 
 jobs:
   update-changelog:
-    if: ${{ github.head_ref != 'main' && github.head_ref != 'develop' }}
+    if: ${{ github.base_ref != 'main' && github.head_ref != 'develop' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -43,7 +43,7 @@ jobs:
         run: |
           # 変更情報取得
           if [[ "${{ github.event_name }}" == 'workflow_dispatch' ]]; then
-            CHANGED_FILES=$(git diff --name-only origin/develop)
+            CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }})
             PROJECTS=$(echo "$CHANGED_FILES" | grep -o '^libs/[^/]*/' | sort | uniq)
           else
             PROJECTS=$(echo ${ALL_CHANGED_FILES} | grep -o '^libs/[^/]*/' | sort | uniq)
