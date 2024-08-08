@@ -80,6 +80,15 @@ RUN pecl install xdebug
 
 COPY ./php.ini /usr/local/etc/php/
 
+# rewriteモジュールを有効にする
+RUN a2enmod rewrite
+# Apacheの設定ファイルをテストする
+RUN apache2ctl configtest
+
 WORKDIR /var/www/laravel
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Apacheを再起動するためのスクリプトを追加します。
+# Dockerコンテナは通常1つのプロセスを実行するため、CMDでApacheをフォアグラウンドで起動します。
+CMD ["apache2-foreground"]
