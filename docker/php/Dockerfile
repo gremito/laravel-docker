@@ -1,4 +1,4 @@
-FROM php:8.1.29-apache
+FROM php:8.2.0-fpm
 
 ENV TZ Asia/Tokyo
 
@@ -7,6 +7,7 @@ RUN apt update
 RUN apt install -y \
             g++ \
             git \
+            htop \
             libbz2-dev \
             libc-client-dev \
             libenchant-2-dev \
@@ -23,11 +24,14 @@ RUN apt install -y \
             libpng-dev \
             libpspell-dev \
             libsnmp-dev \
+            libssl-dev \
             libtidy-dev \
             libxml2-dev \
             libxrender1 \
             libxslt-dev \
             libzip-dev \
+            openssl \
+            procps \
             unzip \
             vim \
             wget \
@@ -80,15 +84,6 @@ RUN pecl install xdebug
 
 COPY ./php.ini /usr/local/etc/php/
 
-# rewriteモジュールを有効にする
-RUN a2enmod rewrite
-# Apacheの設定ファイルをテストする
-RUN apache2ctl configtest
-
 WORKDIR /var/www/laravel
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Apacheを再起動するためのスクリプトを追加します。
-# Dockerコンテナは通常1つのプロセスを実行するため、CMDでApacheをフォアグラウンドで起動します。
-CMD ["apache2-foreground"]
