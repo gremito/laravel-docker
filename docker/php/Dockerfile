@@ -80,7 +80,11 @@ RUN docker-php-ext-install \
             xsl \
             zip
 
-RUN pecl install xdebug
+RUN pecl install xdebug && \
+    docker-php-ext-enable xdebug 
+
+RUN pecl install openswoole && \
+    docker-php-ext-enable openswoole
 
 COPY ./php.ini /usr/local/etc/php/
 
