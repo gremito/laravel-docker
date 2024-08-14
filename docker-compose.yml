@@ -7,10 +7,11 @@ networks:
 services:
   app:
     container_name: app
+    restart: always
     build:
       context: ./docker/php
     ports:
-      - '8080:80'
+      - '9000:9000'
     networks: 
       - laravel
     volumes:
@@ -21,10 +22,10 @@ services:
       - redis
 
   nginx:
-    image: nginx:alpine
     container_name: nginx
-    restart: unless-stopped
-    tty: true
+    restart: always
+    build:
+      context: ./docker/nginx
     ports:
       - '8001:80'
     networks: 
@@ -37,6 +38,7 @@ services:
 
   db:
     image: mysql:8.0
+    restart: always
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -56,6 +58,7 @@ services:
 
   redis:
     image: redis:7.0
+    restart: always
     hostname: redis
     volumes:
       - ./docker/redis:/data

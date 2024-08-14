@@ -80,14 +80,14 @@ RUN docker-php-ext-install \
             xsl \
             zip
 
-RUN pecl install xdebug && \
-    docker-php-ext-enable xdebug 
+RUN pecl install xdebug openswoole protobuf
 
-RUN pecl install openswoole && \
-    docker-php-ext-enable openswoole
+RUN docker-php-ext-enable openswoole protobuf
 
 COPY ./php.ini /usr/local/etc/php/
 
 WORKDIR /var/www/laravel
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+EXPOSE 9000
+
+CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=9000", "--log-level=debug"]
