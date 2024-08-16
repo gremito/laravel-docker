@@ -10,6 +10,8 @@ services:
     restart: always
     build:
       context: ./docker/php
+      args:
+        OCTANE_MAX_REQUESTS: ${OCTANE_MAX_REQUESTS:-1}
     ports:
       - '9000:9000'
     networks: 

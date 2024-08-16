@@ -82,12 +82,12 @@ RUN docker-php-ext-install \
 
 RUN pecl install xdebug openswoole protobuf
 
-RUN docker-php-ext-enable openswoole protobuf
-
 COPY ./php.ini /usr/local/etc/php/
 
 WORKDIR /var/www/laravel
 
 EXPOSE 9000
 
-CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=9000", "--log-level=debug"]
+ARG OCTANE_MAX_REQUESTS
+ENV OCTANE_MAX_REQUESTS=${OCTANE_MAX_REQUESTS}
+CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=9000", "--log-level=debug", "--max-requests=${OCTANE_MAX_REQUESTS}"]
