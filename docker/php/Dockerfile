@@ -1,5 +1,8 @@
 FROM php:8.2.0-fpm
 
+ARG NEW_RELIC_LICENSE_KEY
+ARG NEW_RELIC_APP_NAME
+
 ENV TZ Asia/Tokyo
 
 RUN apt update
@@ -84,10 +87,18 @@ RUN pecl install xdebug openswoole protobuf
 
 COPY ./php.ini /usr/local/etc/php/
 
+RUN echo "newrelic.enabled=true" >> /usr/local/etc/php/conf.d/newrelic.ini \
+    && echo "newrelic.license=${NEW_RELIC_LICENSE_KEY}" >> /usr/local/etc/php/conf.d/newrelic.ini \
+    && echo "newrelic.appname=${NEW_RELIC_APP_NAME}" >> /usr/local/etc/php/conf.d/newrelic.ini \
+    && echo "newrelic.daemon.address=newrelic:31339" >> /usr/local/etc/php/conf.d/newrelic.ini \
+    && echo "newrelic.daemon.port=31339" >> /usr/local/etc/php/conf.d/newrelic.ini
+
+COPY --from=composer:2.4 /usr/bin/composer /usr/bin/composer
+
 WORKDIR /var/www/laravel
 
 EXPOSE 9000
 
-ARG OCTANE_MAX_REQUESTS
-ENV OCTANE_MAX_REQUESTS=${OCTANE_MAX_REQUESTS}
-CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=9000", "--log-level=debug", "--max-requests=${OCTANE_MAX_REQUESTS}"]
+COPY ./entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
