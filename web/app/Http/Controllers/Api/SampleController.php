@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\apis;
+namespace App\Http\Controllers\Api;
 
 use App\Service\RandomNumberService;
 use Illuminate\Http\Response;
@@ -13,6 +13,6 @@ class SampleController extends Controller
 
     public function index(): Response
     {
-        return response('Number:' . $this->service->getNumber(), Response::HTTP_OK);
+        return response("{ \"number\": {$this->service->getNumber()} }", Response::HTTP_OK);
     }
 }
