@@ -8,7 +8,7 @@ services:
 
   newrelic:
     platform: linux/x86_64
-    image: newrelic/php-daemon:10.22.0
+    image: newrelic/php-daemon:11.1.0
     container_name: docker-for-laravel-newrelic
     ports:
       - '31339:31339'
@@ -24,6 +24,7 @@ services:
         OCTANE_MAX_REQUESTS: ${OCTANE_MAX_REQUESTS:-1}
         NEW_RELIC_APP_NAME: ${NEW_RELIC_APP_NAME}
         NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY}
+        NEW_RELIC_AGENT_VERSION: ${NEW_RELIC_AGENT_VERSION}
     container_name: docker-for-laravel-app
     ports:
       - '9000:9000'
