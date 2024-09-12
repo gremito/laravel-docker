@@ -2,6 +2,7 @@ FROM php:8.1.29-apache
 
 ARG NEW_RELIC_LICENSE_KEY
 ARG NEW_RELIC_APP_NAME
+ARG NEW_RELIC_AGENT_VERSION
 
 ENV TZ Asia/Tokyo
 
@@ -83,11 +84,17 @@ RUN pecl install xdebug
 
 COPY ./php.ini /usr/local/etc/php/
 
-RUN echo "newrelic.enabled=true" >> /usr/local/etc/php/conf.d/newrelic.ini \
-    && echo "newrelic.license=${NEW_RELIC_LICENSE_KEY}" >> /usr/local/etc/php/conf.d/newrelic.ini \
-    && echo "newrelic.appname=${NEW_RELIC_APP_NAME}" >> /usr/local/etc/php/conf.d/newrelic.ini \
-    && echo "newrelic.daemon.address=newrelic:31339" >> /usr/local/etc/php/conf.d/newrelic.ini \
-    && echo "newrelic.daemon.port=31339" >> /usr/local/etc/php/conf.d/newrelic.ini
+RUN curl -L https://download.newrelic.com/php_agent/archive/${NEW_RELIC_AGENT_VERSION}/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux.tar.gz | tar -C /tmp -zx \
+    && export NR_INSTALL_USE_CP_NOT_LN=1 \
+    && export NR_INSTALL_SILENT=1 \
+    && /tmp/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux/newrelic-install install \
+    && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*
+
+RUN sed -i \
+  -e "s/newrelic.license[[:space:]]*=[[:space:]]*.*/newrelic.license = ${NEW_RELIC_LICENSE_KEY}/" \
+  -e "s/newrelic.appname[[:space:]]*=[[:space:]]*.*/newrelic.appname = ${NEW_RELIC_APP_NAME}/" \
+  -e "\$a newrelic.daemon.address=newrelic:31339" \
+  /usr/local/etc/php/conf.d/newrelic.ini
 
 WORKDIR /var/www/laravel
 
