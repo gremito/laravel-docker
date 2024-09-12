@@ -1,5 +1,8 @@
 FROM php:8.1.29-apache
 
+ARG NEW_RELIC_LICENSE_KEY
+ARG NEW_RELIC_APP_NAME
+
 ENV TZ Asia/Tokyo
 
 RUN apt update
@@ -79,6 +82,12 @@ RUN docker-php-ext-install \
 RUN pecl install xdebug
 
 COPY ./php.ini /usr/local/etc/php/
+
+RUN echo "newrelic.enabled=true" >> /usr/local/etc/php/conf.d/newrelic.ini \
+    && echo "newrelic.license=${NEW_RELIC_LICENSE_KEY}" >> /usr/local/etc/php/conf.d/newrelic.ini \
+    && echo "newrelic.appname=${NEW_RELIC_APP_NAME}" >> /usr/local/etc/php/conf.d/newrelic.ini \
+    && echo "newrelic.daemon.address=newrelic:31339" >> /usr/local/etc/php/conf.d/newrelic.ini \
+    && echo "newrelic.daemon.port=31339" >> /usr/local/etc/php/conf.d/newrelic.ini
 
 WORKDIR /var/www/laravel
 
