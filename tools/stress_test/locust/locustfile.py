@@ -7,7 +7,7 @@ load_dotenv()
 class UserBehavior(TaskSet):
     @task
     def test_index(self):
-        with self.client.get("/test", headers=headers, catch_response=True) as response:
+        with self.client.get("/sample", headers=headers, catch_response=True) as response:
             self.result = response.json()['result']
             if self.result
                 response.success()

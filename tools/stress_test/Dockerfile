@@ -2,7 +2,8 @@ FROM python:3.9
 
 USER root
 
-COPY ./locust/* ./
-COPY ./.env ./
+WORKDIR /usr/src/app
 
-RUN pip install -r ./requirements.txt
+COPY ./config/* ./
+
+RUN pip install --no-cache-dir -r requirements.txt

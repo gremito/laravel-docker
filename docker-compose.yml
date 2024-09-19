@@ -1,9 +1,5 @@
 version: "3"
 
-networks: 
-  laravel:
-    driver: bridge
-
 services:
 
   newrelic:
@@ -14,8 +10,6 @@ services:
       - '31339:31339'
     environment:
       - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY}
-    networks:
-      - laravel
 
   app:
     build:
@@ -28,8 +22,6 @@ services:
     container_name: docker-for-laravel-app
     ports:
       - '9000:9000'
-    networks: 
-      - laravel
     volumes:
       - ./web:/var/www/laravel
     depends_on:
@@ -43,8 +35,6 @@ services:
     container_name: docker-for-laravel-nginx
     ports:
       - '8001:80'
-    networks: 
-      - laravel
     volumes: 
       - ./web:/var/www/laravel
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
@@ -66,8 +56,6 @@ services:
       - ./docker/mysql/sql:/docker-entrypoint-initdb.d
     ports:
       - 3306:3306
-    networks: 
-      - laravel
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 
   redis:
@@ -78,6 +66,4 @@ services:
       - ./docker/redis:/data
     ports:
       - '6479:6479'
-    networks: 
-      - laravel
     command: redis-server --slaveof redis-master 6379
