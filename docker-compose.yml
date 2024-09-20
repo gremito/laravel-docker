@@ -1,16 +1,6 @@
 version: "3"
 
 services:
-
-  newrelic:
-    platform: linux/x86_64
-    image: newrelic/php-daemon:11.1.0
-    container_name: docker-for-laravel-newrelic
-    ports:
-      - '31339:31339'
-    environment:
-      - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY}
-
   app:
     build:
       context: ./docker/php
@@ -25,7 +15,6 @@ services:
     volumes:
       - ./web:/var/www/laravel
     depends_on:
-      - newrelic
       - db
       - redis
 
