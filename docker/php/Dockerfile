@@ -9,7 +9,9 @@ ENV TZ Asia/Tokyo
 RUN apt update
 
 RUN apt install -y \
+            autoconf \
             g++ \
+            gcc \
             git \
             htop \
             libbz2-dev \
@@ -34,6 +36,7 @@ RUN apt install -y \
             libxrender1 \
             libxslt-dev \
             libzip-dev \
+            make \
             openssl \
             procps \
             unzip \
@@ -84,7 +87,11 @@ RUN docker-php-ext-install \
             xsl \
             zip
 
-RUN pecl install xdebug openswoole protobuf
+RUN pecl install \
+  openswoole \
+  opentelemetry \
+  protobuf \
+  xdebug
 
 COPY ./php.ini /usr/local/etc/php/
 

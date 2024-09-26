@@ -12,7 +12,8 @@
         "laravel/octane": "^2.5",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
-        "open-telemetry/context-swoole": "^1.0"
+        "open-telemetry/context-swoole": "^1.0",
+        "open-telemetry/opentelemetry": "^1.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
@@ -29,7 +30,11 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "classmap": [
+            "vendor/laravel/octane/src",
+            "vendor/open-telemetry/exporter-otlp"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -62,7 +67,8 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
-            "pestphp/pest-plugin": true
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": false
         }
     },
     "minimum-stability": "stable",
