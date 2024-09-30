@@ -88,8 +88,8 @@ RUN docker-php-ext-install \
             xsl \
             zip
 
-RUN pecl install xdebug \
-  && docker-php-ext-enable xdebug
+RUN pecl install redis \
+  && docker-php-ext-enable redis
 
 RUN pecl install apcu \
   && docker-php-ext-enable apcu
@@ -100,7 +100,10 @@ RUN pecl install openswoole \
 RUN pecl install protobuf \
   && docker-php-ext-enable protobuf
 
+RUN pecl install xdebug 
+
 COPY ./php.ini /usr/local/etc/php/
+COPY ./xdebug.ini /usr/local/etc/php/
 
 RUN pecl clear-cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*

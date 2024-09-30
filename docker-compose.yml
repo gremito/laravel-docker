@@ -46,9 +46,7 @@ services:
 
   redis:
     image: redis:7.0
-    hostname: redis
     volumes:
       - ./docker/redis:/data
     ports:
-      - '6479:6479'
-    command: redis-server --slaveof redis-master 6379
+      - '6379:6379'
