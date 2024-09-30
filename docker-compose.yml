@@ -6,9 +6,6 @@ services:
       context: ./docker/php
       args:
         OCTANE_MAX_REQUESTS: ${OCTANE_MAX_REQUESTS:-1}
-        NEW_RELIC_APP_NAME: ${NEW_RELIC_APP_NAME}
-        NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY}
-        NEW_RELIC_AGENT_VERSION: ${NEW_RELIC_AGENT_VERSION}
     ports:
       - '9000:9000'
     volumes:
