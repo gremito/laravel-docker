@@ -6,9 +6,10 @@ ARG NEW_RELIC_AGENT_VERSION
 
 ENV TZ Asia/Tokyo
 
-RUN apt update
+RUN apt-get update
 
-RUN apt install -y \
+RUN apt-get install -y \
+            autoconf \
             g++ \
             git \
             htop \
@@ -26,6 +27,7 @@ RUN apt install -y \
             libmcrypt-dev \
             libonig-dev \
             libpng-dev \
+            libprotobuf-dev \
             libpspell-dev \
             libsnmp-dev \
             libssl-dev \
@@ -35,7 +37,9 @@ RUN apt install -y \
             libxslt-dev \
             libzip-dev \
             openssl \
+            pkg-config \
             procps \
+            protobuf-compiler \
             unzip \
             vim \
             wget \
@@ -84,9 +88,22 @@ RUN docker-php-ext-install \
             xsl \
             zip
 
-RUN pecl install xdebug openswoole protobuf
+RUN pecl install xdebug \
+  && docker-php-ext-enable xdebug
+
+RUN pecl install apcu \
+  && docker-php-ext-enable apcu
+
+RUN pecl install openswoole \
+  && docker-php-ext-enable openswoole
+
+RUN pecl install protobuf \
+  && docker-php-ext-enable protobuf
 
 COPY ./php.ini /usr/local/etc/php/
+
+RUN pecl clear-cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2.4 /usr/bin/composer /usr/bin/composer
 

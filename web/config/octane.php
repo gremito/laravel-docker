@@ -12,13 +12,10 @@ use Laravel\Octane\Events\WorkerErrorOccurred;
 use Laravel\Octane\Events\WorkerStarting;
 use Laravel\Octane\Events\WorkerStopping;
 use Laravel\Octane\Listeners\CloseMonologHandlers;
-use Laravel\Octane\Listeners\CollectGarbage;
-use Laravel\Octane\Listeners\DisconnectFromDatabases;
 use Laravel\Octane\Listeners\EnsureUploadedFilesAreValid;
 use Laravel\Octane\Listeners\EnsureUploadedFilesCanBeMoved;
 use Laravel\Octane\Listeners\FlushOnce;
 use Laravel\Octane\Listeners\FlushTemporaryContainerInstances;
-use Laravel\Octane\Listeners\FlushUploadedFiles;
 use Laravel\Octane\Listeners\ReportException;
 use Laravel\Octane\Listeners\StopWorkerIfNecessary;
 use Laravel\Octane\Octane;
@@ -150,10 +147,10 @@ return [
     */
 
     'tables' => [
-        'example:1000' => [
-            'name' => 'string:1000',
-            'votes' => 'int',
-        ],
+        // 'example:1000' => [
+        //     'name' => 'string:1000',
+        //     'votes' => 'int',
+        // ],
     ],
 
     /*
@@ -168,8 +165,8 @@ return [
     */
 
     'cache' => [
-        'rows' => 1000,
-        'bytes' => 10000,
+        // 'rows' => 1000,
+        // 'bytes' => 10000,
     ],
 
     /*
@@ -221,4 +218,19 @@ return [
 
     'max_execution_time' => 30,
 
+    'swoole' => [
+        'options' => [
+            'compression_min_length' => 128,
+            'document_root' => public_path(),
+            'enable_static_handler' => true,
+            'http_compression_level' => 6, // 1 - 9
+            'http_compression' => true,
+            'log_file' => storage_path('logs/swoole.log'),
+            'open_http2_protocol' => true,
+            'package_max_length' => 512 * 1024 * 1024, // 512MB
+            'reactor_num' => 4,
+            'task_worker_num' => 8,
+            'worker_num' => 8,
+        ],
+    ],
 ];

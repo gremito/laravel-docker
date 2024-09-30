@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Service\RandomNumberService;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 
 class SampleController extends Controller
 {
@@ -13,6 +14,8 @@ class SampleController extends Controller
 
     public function index(): Response
     {
-        return response('Number:' . $this->service->getNumber(), Response::HTTP_OK);
+        Cache::store('apc')->forever("getNumber", $this->service->getNumber());
+        $num = Cache::store('apc')->get("getNumber", "-1");
+        return response('Number:' . $num, Response::HTTP_OK);
     }
 }
