@@ -1,16 +1,14 @@
-FROM php:8.1.29-apache
-
-ARG NEW_RELIC_LICENSE_KEY
-ARG NEW_RELIC_APP_NAME
-ARG NEW_RELIC_AGENT_VERSION
+FROM php:8.2.0-apache
 
 ENV TZ Asia/Tokyo
 
-RUN apt update
+RUN apt-get update
 
-RUN apt install -y \
+RUN apt-get install -y \
+            autoconf \
             g++ \
             git \
+            htop \
             libbz2-dev \
             libc-client-dev \
             libenchant-2-dev \
@@ -25,13 +23,19 @@ RUN apt install -y \
             libmcrypt-dev \
             libonig-dev \
             libpng-dev \
+            libprotobuf-dev \
             libpspell-dev \
             libsnmp-dev \
+            libssl-dev \
             libtidy-dev \
             libxml2-dev \
             libxrender1 \
             libxslt-dev \
             libzip-dev \
+            openssl \
+            pkg-config \
+            procps \
+            protobuf-compiler \
             unzip \
             vim \
             wget \
@@ -80,9 +84,21 @@ RUN docker-php-ext-install \
             xsl \
             zip
 
-RUN pecl install xdebug
+RUN pecl install redis \
+  && docker-php-ext-enable redis
+
+RUN pecl install apcu \
+  && docker-php-ext-enable apcu
+
+RUN pecl install xdebug 
 
 COPY ./php.ini /usr/local/etc/php/
+COPY ./xdebug.ini /usr/local/etc/php/
+
+RUN pecl clear-cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:2.4 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/laravel
 
