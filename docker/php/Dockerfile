@@ -90,16 +90,11 @@ RUN pecl install redis \
 RUN pecl install apcu \
   && docker-php-ext-enable apcu
 
-RUN pecl install openswoole \
-  && docker-php-ext-enable openswoole
-
-RUN pecl install protobuf \
-  && docker-php-ext-enable protobuf
-
 RUN pecl install xdebug 
 
 COPY ./php.ini /usr/local/etc/php/
 COPY ./xdebug.ini /usr/local/etc/php/
+COPY ./php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
 
 RUN pecl clear-cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -107,8 +102,6 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 COPY --from=composer:2.4 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/laravel
-
-EXPOSE 9000
 
 COPY ./entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh

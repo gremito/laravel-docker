@@ -1,7 +1,16 @@
 #!/bin/bash
 set -e
 
-composer install
+if [ ! -f "vendor/autoload.php" ]; then
+    composer install --no-progress --no-interaction
+fi
+
+if [ ! -f ".env" ]; then
+    echo "Creating env file for env $APP_ENV"
+    cp .env.example .env
+else
+    echo "env file exists."
+fi
 
 APP_KEY=$(grep '^APP_KEY=' .env | cut -d '=' -f2-)
 if [ -z "$APP_KEY" ]; then
