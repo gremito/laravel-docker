@@ -19,10 +19,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/apc', function () {
-    return view('apc');
-});
-
 Route::get('/sample', [SampleController::class, "index"])->name("sample.index");
 
 Route::get("/users", [UserController::class, "index"])->name("users.index");
