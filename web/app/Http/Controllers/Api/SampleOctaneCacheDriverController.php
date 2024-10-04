@@ -6,7 +6,7 @@ use App\Service\RandomNumberService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 
-class SampleController extends Controller
+class SampleOctaneCacheDriverController extends Controller
 {
     public function __construct(
         private RandomNumberService $service
@@ -14,8 +14,8 @@ class SampleController extends Controller
 
     public function index(): Response
     {
-        Cache::store('apc')->forever("getNumber", $this->service->getNumber());
-        $num = Cache::store('apc')->get("getNumber", "-1");
+        Cache::store('octane')->forever("getNumber", $this->service->getNumber());
+        $num = Cache::store('octane')->get("getNumber", "-1");
         return response("{ \"number\": {$num} }", Response::HTTP_OK);
     }
 }

@@ -23,6 +23,14 @@ Route::controller(Controllers\Api\SampleController::class)->group(function () {
     Route::get('/sample', 'index');
 });
 
+Route::controller(Controllers\Api\SampleOctaneCacheDriverController::class)->group(function () {
+    Route::get('/sample/octane_cache', 'index');
+});
+
+Route::controller(Controllers\Api\SampleOctaneTablesController::class)->group(function () {
+    Route::get('/sample/octane_tables', 'index');
+});
+
 Route::get('/', function () {
     return response()->json([
         'message' => 'This is a simple example of item returned by your APIs. Everyone can see it.'
