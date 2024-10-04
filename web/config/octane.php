@@ -147,10 +147,10 @@ return [
     */
 
     'tables' => [
-        // 'example:1000' => [
-        //     'name' => 'string:1000',
-        //     'votes' => 'int',
-        // ],
+        'stats:1024' => [
+            'name' => 'int:1024',
+            'count' => 'int',
+        ],
     ],
 
     /*
@@ -165,8 +165,8 @@ return [
     */
 
     'cache' => [
-        // 'rows' => 1000,
-        // 'bytes' => 10000,
+        'rows' => 1000,
+        'bytes' => 10000,
     ],
 
     /*
