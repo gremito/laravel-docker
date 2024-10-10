@@ -14,6 +14,11 @@ class SampleController extends Controller
 
     public function index(): Response
     {
+        return response('RandomNumberService getNumber:' . $this->service->getNumber(), Response::HTTP_OK);
+    }
+
+    public function getNumber(): Response
+    {
         Cache::store('apc')->forever("getNumber", $this->service->getNumber());
         $num = Cache::store('apc')->get("getNumber", "-1");
         return response('Number:' . $num, Response::HTTP_OK);
