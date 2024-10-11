@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Service\RandomNumberService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 
 class SampleController extends Controller
 {
@@ -20,6 +21,8 @@ class SampleController extends Controller
 
     public function getNumber(): Response
     {
-        return response("{ \"number\": {$this->service->getNumber()} }", Response::HTTP_OK);
+        Cache::store('apc')->forever("getNumber", $this->service->getNumber());
+        $num = Cache::store('apc')->get("getNumber", "-1");
+        return response("{ \"number\": {$num} }", Response::HTTP_OK);
     }
 }
