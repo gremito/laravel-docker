@@ -1,8 +1,7 @@
 <?php
 
 use App\Http\Controllers\SampleController;
-use App\Http\Controllers\SampleOctaneCacheDriverController;
-use App\Http\Controllers\SampleOctaneTablesController;
+use App\Http\Controllers\SampleOctaneCacheController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,10 +20,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/sample', [SampleController::class, "index"]);
+Route::get('/sample/number', [SampleController::class, "index"]);
 Route::get('/sample/number/redis', [SampleController::class, "numberOfRedisCache"]);
 Route::get('/sample/number/apc', [SampleController::class, "numberOfApcCache"]);
-Route::get('/sample/octane_cache', [SampleOctaneCacheDriverController::class, "index"]);
-Route::get('/sample/octane_tables', [SampleOctaneTablesController::class, "index"]);
+Route::get('/sample/number/octane/cache', [SampleOctaneCacheController::class, "index"]);
+Route::get('/sample/number/octane/tables', [SampleOctaneCacheController::class, "octaneTable"]);
 
 Route::get("/users", [UserController::class, "index"]);
