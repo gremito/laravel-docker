@@ -21,9 +21,12 @@ Route::get('/', function () {
 });
 
 Route::get('/sample/number', [SampleController::class, "index"]);
-Route::get('/sample/number/redis', [SampleController::class, "numberOfRedisCache"]);
-Route::get('/sample/number/apc', [SampleController::class, "numberOfApcCache"]);
+Route::get('/sample/number/apc', [SampleController::class, "number_of_apc_cache"]);
+Route::get('/sample/number/redis', [SampleController::class, "number_of_redis_cache"]);
+Route::get('/sample/long/apc', [SampleController::class, "long_key_value_apc_cache"]);
+Route::get('/sample/long/redis', [SampleController::class, "long_key_value_redis_cache"]);
 Route::get('/sample/number/octane/cache', [SampleOctaneCacheController::class, "index"]);
-Route::get('/sample/number/octane/tables', [SampleOctaneCacheController::class, "octaneTable"]);
+Route::get('/sample/long/octane/cache', [SampleOctaneCacheController::class, "long_key_value_cache"]);
+Route::get('/sample/number/octane/tables', [SampleOctaneCacheController::class, "octane_table"]);
 
 Route::get("/users", [UserController::class, "index"]);
