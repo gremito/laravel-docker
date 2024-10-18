@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Service\RandomNumberService;
+use App\Service\RandomService;
 use Illuminate\Http\Response;
 use Laravel\Octane\Facades\Octane;
 
 class SampleOctaneTablesController extends Controller
 {
     public function __construct(
-        private RandomNumberService $service
+        private RandomService $service
     ){}
 
     public function index(): Response

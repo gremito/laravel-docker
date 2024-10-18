@@ -6,6 +6,9 @@ services:
       context: ./docker/php
     volumes:
       - ./web:/var/www/laravel
+    environment:
+      - OCTANE_WORKERS=${OCTANE_WORKERS}
+      - OCTANE_MAX_REQUESTS=${OCTANE_MAX_REQUESTS}
     depends_on:
       - mysql
       - redis

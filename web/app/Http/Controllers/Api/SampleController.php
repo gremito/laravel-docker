@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Service\RandomNumberService;
 use Illuminate\Http\Request;
+use App\Service\RandomService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 
 class SampleController extends Controller
 {
     public function __construct(
-        private RandomNumberService $service
+        private RandomService $service
     ){}
 
     public function index(Request $request): Response
