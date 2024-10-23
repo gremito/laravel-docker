@@ -1,8 +1,7 @@
 <?php
 
 use App\Http\Controllers\SampleController;
-use App\Http\Controllers\SampleOctaneCacheDriverController;
-use App\Http\Controllers\SampleOctaneTablesController;
+use App\Http\Controllers\TransactionSampleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,7 +21,16 @@ Route::get('/', function () {
 });
 
 Route::get('/sample/number', [SampleController::class, "index"]);
-Route::get('/sample/number/redis', [SampleController::class, "numberOfRedisCache"]);
-Route::get('/sample/number/apc', [SampleController::class, "numberOfApcCache"]);
+Route::get('/sample/number/apc', [SampleController::class, "number_of_apc_cache"]);
+Route::get('/sample/number/redis', [SampleController::class, "number_of_redis_cache"]);
+Route::get('/sample/long/apc', [SampleController::class, "long_key_value_apc_cache"]);
+Route::get('/sample/long/redis', [SampleController::class, "long_key_value_redis_cache"]);
+
+Route::get('/sample/normal/get', [TransactionSampleController::class, 'normalGet']);
+Route::get('/sample/transaction/get', [TransactionSampleController::class, 'transactionGet']);
+Route::get('/sample/normal/create', [TransactionSampleController::class, 'normalCreate']);
+Route::get('/sample/transaction/create', [TransactionSampleController::class, 'transactionCreate']);
+Route::get('/sample/normal/update', [TransactionSampleController::class, 'normalUpdate']);
+Route::get('/sample/transaction/update', [TransactionSampleController::class, 'transactionUpdate']);
 
 Route::get("/users", [UserController::class, "index"]);
