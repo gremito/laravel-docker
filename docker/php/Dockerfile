@@ -6,6 +6,7 @@ RUN apt-get update
 
 RUN apt-get install -y \
             autoconf \
+            cmake \
             g++ \
             git \
             htop \
@@ -84,13 +85,32 @@ RUN docker-php-ext-install \
             xsl \
             zip
 
+# redis
 RUN pecl install redis \
   && docker-php-ext-enable redis
 
+# apcu
 RUN pecl install apcu \
   && docker-php-ext-enable apcu
 
+# xdebug
 RUN pecl install xdebug 
+
+# OpenSwoole
+RUN pecl install openswoole
+
+# gRPCインストール
+# ref: https://github.com/grpc/grpc/tree/master/src/php#grpc_php_plugin-protoc-plugin
+RUN MAKEFLAGS="-j 4" pecl install grpc
+WORKDIR /root
+RUN git clone https://github.com/grpc/grpc
+WORKDIR grpc
+RUN git submodule update --init
+RUN mkdir -p cmake/build
+WORKDIR cmake/build
+RUN cmake ../..
+RUN make protoc grpc_php_plugin
+WORKDIR /root
 
 COPY ./php.ini /usr/local/etc/php/
 COPY ./xdebug.ini /usr/local/etc/php/

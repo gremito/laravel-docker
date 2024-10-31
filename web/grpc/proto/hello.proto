@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package hello;
+
+// option php_namespace = "app\\Grpc\\Hello";
+
+service Hello {
+    rpc SayHello (HelloRequest) returns (HelloResponse);
+}
+
+message HelloRequest {
+    string name = 1;
+}
+
+message HelloResponse {
+    string message = 1;
+}
