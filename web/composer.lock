@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3c59bb69b468bd1817685a2aee26380f",
+    "content-hash": "9c42ec3b07b73173f704bb3d85c5672e",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -2608,16 +2608,16 @@
         },
         {
             "name": "laravel/telescope",
-            "version": "v5.2.3",
+            "version": "v5.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/telescope.git",
-                "reference": "a7e9e1332361a31de6eb94cf1d356500c3a89301"
+                "reference": "749369e996611d803e7c1b57929b482dd676008d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/telescope/zipball/a7e9e1332361a31de6eb94cf1d356500c3a89301",
-                "reference": "a7e9e1332361a31de6eb94cf1d356500c3a89301",
+                "url": "https://api.github.com/repos/laravel/telescope/zipball/749369e996611d803e7c1b57929b482dd676008d",
+                "reference": "749369e996611d803e7c1b57929b482dd676008d",
                 "shasum": ""
             },
             "require": {
@@ -2671,9 +2671,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/telescope/issues",
-                "source": "https://github.com/laravel/telescope/tree/v5.2.3"
+                "source": "https://github.com/laravel/telescope/tree/v5.2.4"
             },
-            "time": "2024-10-13T15:11:07+00:00"
+            "time": "2024-10-29T15:35:13+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -4186,16 +4186,16 @@
         },
         {
             "name": "openswoole/grpc",
-            "version": "22.1.5",
+            "version": "22.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/openswoole/grpc.git",
-                "reference": "d8d630378eea6e2090a099ffd3b9e664aeefeb0f"
+                "reference": "c44cd29ce37d14ea61ecbf96b4cb28a2348a876d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/openswoole/grpc/zipball/d8d630378eea6e2090a099ffd3b9e664aeefeb0f",
-                "reference": "d8d630378eea6e2090a099ffd3b9e664aeefeb0f",
+                "url": "https://api.github.com/repos/openswoole/grpc/zipball/c44cd29ce37d14ea61ecbf96b4cb28a2348a876d",
+                "reference": "c44cd29ce37d14ea61ecbf96b4cb28a2348a876d",
                 "shasum": ""
             },
             "require": {
@@ -4232,9 +4232,9 @@
             "description": "OpenSwoole GRPC framework for building high performance services",
             "support": {
                 "issues": "https://github.com/openswoole/grpc/issues",
-                "source": "https://github.com/openswoole/grpc/tree/22.1.5"
+                "source": "https://github.com/openswoole/grpc/tree/22.1.6"
             },
-            "time": "2023-12-10T19:00:45+00:00"
+            "time": "2024-09-08T22:06:16+00:00"
         },
         {
             "name": "phpoption/phpoption",
@@ -8197,16 +8197,16 @@
         },
         {
             "name": "laravel/sail",
-            "version": "v1.37.0",
+            "version": "v1.37.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/sail.git",
-                "reference": "5d385f2e698f0f774cdead82aff5d989fb95309b"
+                "reference": "7efa151ea0d16f48233d6a6cd69f81270acc6e93"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/sail/zipball/5d385f2e698f0f774cdead82aff5d989fb95309b",
-                "reference": "5d385f2e698f0f774cdead82aff5d989fb95309b",
+                "url": "https://api.github.com/repos/laravel/sail/zipball/7efa151ea0d16f48233d6a6cd69f81270acc6e93",
+                "reference": "7efa151ea0d16f48233d6a6cd69f81270acc6e93",
                 "shasum": ""
             },
             "require": {
@@ -8256,7 +8256,7 @@
                 "issues": "https://github.com/laravel/sail/issues",
                 "source": "https://github.com/laravel/sail"
             },
-            "time": "2024-10-21T17:13:38+00:00"
+            "time": "2024-10-29T20:18:14+00:00"
         },
         {
             "name": "mockery/mockery",

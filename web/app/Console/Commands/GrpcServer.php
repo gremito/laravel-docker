@@ -15,20 +15,21 @@ class GrpcServer extends Command
 {
     protected $signature = 'grpc:serve';
     protected $description = 'Start the gRPC server';
+    const PORT = 9501;
 
     public function handle()
     {
-        $this->info('Starting Swoole gRPC Server...');
-
         // co::set(['hook_flags' => OpenSwoole\Runtime::HOOK_ALL]);
 
-        $server = new Server("0.0.0.0", 50051, SWOOLE_BASE, SWOOLE_SOCK_TCP);
+        $server = new Server("0.0.0.0", self::PORT);
         $server
             ->addMiddleware(new LoggingMiddleware())
             ->addMiddleware(new TraceMiddleware());
         $server
             ->set([
                 'open_http2_protocol' => true,
+                // 'reactor_num' => 1,
+                // 'worker_num' => 1,
                 'log_level' => \OpenSwoole\Constant::LOG_INFO,
                 'log_file' => storage_path('logs/grpc_server.log'),
             ]);
@@ -45,7 +46,7 @@ class GrpcServer extends Command
             return time();
         });
 
-        $this->info('gRPC server started on 0.0.0.0:50051');
+        $this->info("gRPC server started");
 
         $server->start();
     }
