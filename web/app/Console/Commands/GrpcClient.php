@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use OpenSwoole\Coroutine as Co;
 use Hello\HelloClient;
 use Hello\HelloRequest;
 use Illuminate\Console\Command;
@@ -16,13 +17,15 @@ class GrpcClient extends Command
 
     public function handle()
     {
-        $conn    = (new Client('127.0.0.1', 9501))->connect();
-        $client  = new HelloClient($conn);
-        $message = new HelloRequest();
-        $message->setName("taro");
-        $out = $client->SayHello($message);
-        var_dump($out);
-        $conn->close();
-        echo "closed\n";
+        co::run(function () {
+            $conn    = (new Client('127.0.0.1', 9501))->connect();
+            $client  = new HelloClient($conn);
+            $message = new HelloRequest();
+            $message->setName("taro");
+            $out = $client->SayHello($message);
+            var_dump($out->serializeToJsonString());
+            $conn->close();
+            echo "closed\n";
+        });
     }
 }

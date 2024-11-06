@@ -4,6 +4,8 @@ services:
   app:
     build:
       context: ./docker/php
+    ports:
+      - '9501:9501'
     volumes:
       - ./web:/var/www/laravel
     depends_on:

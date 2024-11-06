@@ -21,5 +21,5 @@ docker exec -it php-apache /bin/bash -c 'php artisan test'
 /root/grpc/cmake/build/third_party/protobuf/protoc --php_out=grpc \
                                                     --openswoole-grpc_out=grpc \
                                                     --plugin=protoc-gen-grpc=protoc-gen-openswoole-grpc \
-                                                    grpc/proto/hello.proto
+                                                    hello.proto
 ```
