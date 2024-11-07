@@ -1,4 +1,4 @@
-FROM php:8.2.0-fpm
+FROM php:8.2.0-cli
 
 ENV TZ Asia/Tokyo
 
@@ -7,11 +7,15 @@ RUN apt-get update
 RUN apt-get install -y \
             autoconf \
             cmake \
+            curl \
             g++ \
             git \
             htop \
             libbz2-dev \
+            libc-ares2 \
             libc-client-dev \
+            libcurl4-gnutls-dev \
+            libcurl4-openssl-dev \
             libenchant-2-dev \
             libffi-dev \
             libfontconfig1 \
@@ -94,10 +98,15 @@ RUN pecl install apcu \
   && docker-php-ext-enable apcu
 
 # xdebug
-RUN pecl install xdebug 
+RUN pecl install xdebug
 
-# OpenSwoole
-RUN pecl install openswoole
+# # c-ares
+# WORKDIR /tmp
+# RUN wget https://github.com/c-ares/c-ares/releases/download/v1.34.2/c-ares-1.34.2.tar.gz
+# RUN mkdir -p c-ares && tar -zxvf c-ares-1.34.2.tar.gz -C c-ares --strip-components=1
+# WORKDIR c-ares
+# RUN ./configure && make && make install
+# WORKDIR /root
 
 # gRPCインストール
 # ref: https://github.com/grpc/grpc/tree/master/src/php#grpc_php_plugin-protoc-plugin

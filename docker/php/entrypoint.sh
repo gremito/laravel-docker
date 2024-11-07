@@ -8,4 +8,5 @@ php artisan migrate
 php artisan optimize
 php artisan view:cache
 
-php-fpm --nodaemonize
+# php-fpm --nodaemonize
+tail -f /dev/null
