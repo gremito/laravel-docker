@@ -119,6 +119,7 @@ RUN mkdir -p cmake/build
 WORKDIR cmake/build
 RUN cmake ../..
 RUN make protoc grpc_php_plugin
+RUN ln -s /root/grpc/cmake/build/third_party/protobuf/protoc /usr/local/bin
 WORKDIR /root
 
 COPY ./php.ini /usr/local/etc/php/
