@@ -1,0 +1,29 @@
+version: '3'
+services:
+  locust-master:
+    build: .
+    volumes:
+      - ./.env:/usr/src/app/.env
+      - ./tests:/usr/src/app/tests
+    networks:
+        - docker-for-laravel_default
+    ports:
+      - "8089:8089"
+    # Web上からテスト実行の場合
+    # command: locust -f $LOCUSTFILE --host=$WEBAPI_HOST --master
+    # # CLIからテスト実行の場合
+    command: locust -f $LOCUSTFILE --headless --host=$WEBAPI_HOST --users $USERS --spawn-rate $SPAWN_RATE --run-time $RUN_TIME --csv locust_stress_test
+
+  locust-worker:
+    build: .
+    networks:
+        - docker-for-laravel_default
+    depends_on:
+      - locust-master
+    command: locust -f $LOCUSTFILE --worker --master-host=locust-master
+    deploy:
+      replicas: 10
+
+networks:
+  docker-for-laravel_default:
+    external: true

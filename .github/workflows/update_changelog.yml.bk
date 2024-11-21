@@ -1,0 +1,88 @@
+name: Update CHANGELOG
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update_changelog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: コードのチェックアウト
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: 特定のディレクトリでの変更を確認
+        id: check_changes
+        run: |
+          git fetch origin main
+          git diff --name-only origin/main...HEAD > changed_files.txt
+          grep "^web/" changed_files.txt > relevant_changes.txt || true
+          if [ -s relevant_changes.txt ]; then
+            echo "特定のディレクトリに変更が検出されました"
+            echo "changes=true" >> $GITHUB_ENV
+            # git log --format="%H" origin/main...HEAD -- $(cat relevant_changes.txt) > commit_hashes.txt
+            git log --format="%H" -- $(cat relevant_changes.txt) > commit_hashes.txt
+          else
+            echo "特定のディレクトリに変更が検出されませんでした"
+            echo "changes=false" >> $GITHUB_ENV
+          fi
+
+      - name: プルリクエスト情報の取得
+        if: env.changes == 'true'
+        id: get_pr_info
+        run: |
+          touch pr_info.txt
+          while IFS= read -r commit_hash; do
+            PR=$(gh pr list --state merged --search "$commit_hash" --json title,number --jq '.[] | "\(.title) (#\(.number))"')
+            if [ ! -n "$PR" ]; then
+              continue
+            fi
+            if grep -q "$PR" "pr_info.txt"; then
+              continue
+            fi
+            echo "- $PR" >> pr_info.txt
+          done < commit_hashes.txt
+        env:
+          GH_TOKEN: ${{ secrets.GIT_HUB_TOKEN  }}
+
+      - name: 新しいブランチの作成
+        if: env.changes == 'true'
+        run: |
+          BRANCH_NAME=update-changelog-$(date +'%Y%m%d%H%M%S')
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          git checkout -b $BRANCH_NAME
+
+      - name: CHANGELOGに追記
+        if: env.changes == 'true'
+        run: |
+          cd ./web
+          if [ ! -e CHANGELOG.md ]; then
+            touch CHANGELOG.md
+          fi
+          RELEASE_DATE=$(date +'%Y-%m-%d')
+          head -n 5 CHANGELOG.md > changelog_head.txt
+          tail -n +6 CHANGELOG.md > changelog_tail.txt
+          echo "## $RELEASE_DATE" > new_changelog.txt
+          cat ../pr_info.txt >> new_changelog.txt
+          echo "" >> new_changelog.txt
+          cat changelog_tail.txt >> new_changelog.txt
+          cat changelog_head.txt new_changelog.txt > CHANGELOG.md
+          cd ../
+
+      - name: 変更をコミットしてプッシュ
+        if: env.changes == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add ./web/CHANGELOG.md
+          git commit -m "Update CHANGELOG for $RELEASE_DATE"
+          git push origin HEAD
+
+      - name: 新しいPRを作成
+        if: env.changes == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
+        run: |
+          gh pr create --title "Update CHANGELOG for $RELEASE_DATE" --body "This PR updates the CHANGELOG with changes from $RELEASE_DATE" --base main --head ${{ env.BRANCH_NAME }}

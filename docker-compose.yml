@@ -1,22 +1,32 @@
 version: "3"
 
 services:
-  php-apache:
-    container_name: php-apache
+  app:
     build:
       context: ./docker/php
+      args:
+        OCTANE_MAX_REQUESTS: ${OCTANE_MAX_REQUESTS:-1}
     ports:
-        - '8080:80'
+      - '9000:9000'
     volumes:
       - ./web:/var/www/laravel
-      - ./docker/apache/default.conf:/etc/apache2/sites-enabled/000-default.conf
     depends_on:
       - db
       - redis
 
+  nginx:
+    build:
+      context: ./docker/nginx
+    ports:
+      - '8001:80'
+    volumes: 
+      - ./web:/var/www/laravel
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on: 
+      - app
+
   db:
     image: mysql:8.0
-    container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: laravel
@@ -33,9 +43,7 @@ services:
 
   redis:
     image: redis:7.0
-    hostname: redis
     volumes:
       - ./docker/redis:/data
     ports:
-      - '6479:6479'
-    command: redis-server --slaveof redis-master 6379
+      - '6379:6379'

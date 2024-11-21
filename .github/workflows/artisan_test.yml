@@ -2,7 +2,7 @@ name: "php artisan test"
 
 on:
   pull_request:
-    types: [opened, reopened]
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
 
 env:
@@ -11,11 +11,10 @@ env:
 
 jobs:
   build:
+    if: github.event.pull_request.draft == false
     name: "Run Test"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
       - name: Checkout code
         uses: actions/checkout@v2
 
