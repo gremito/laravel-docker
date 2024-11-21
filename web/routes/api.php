@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::controller(Controllers\Api\SampleController::class)->group(function () {
     Route::get('/sample', 'index');
+    Route::get('/sample/get_number', 'getNumber');
 });
 
 Route::get('/', function () {
