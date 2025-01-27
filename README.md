@@ -8,4 +8,9 @@ docker exec -it php-apache /bin/bash -c 'php artisan key:generate'
 docker exec -it php-apache /bin/bash -c 'php artisan migrate'
 docker exec -it php-apache /bin/bash -c 'php artisan db:seed'
 docker exec -it php-apache /bin/bash -c 'php artisan test'
+
+# roadrunner
+# ref: https://laravel.com/docs/11.x/octane#roadrunner
+./vendor/bin/rr get-binary
+chmod +x ./rr
 ```
