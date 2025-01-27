@@ -30,8 +30,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: laravel
-      MYSQL_USER: docker
-      MYSQL_PASSWORD: docker
+      # MYSQL_USER: docker
+      # MYSQL_PASSWORD: docker
       TZ: 'Asia/Tokyo'
     volumes:
       - ./docker/mysql/data:/var/lib/mysql
