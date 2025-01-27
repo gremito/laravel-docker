@@ -21,7 +21,7 @@ class SampleController extends Controller
 
     public function getNumber(): Response
     {
-        Cache::store('apc')->forever("getNumber", $this->service->getNumber());
+        Cache::store('apc')->forever("getNumber", $this->service->get_number());
         $num = Cache::store('apc')->get("getNumber", "-1");
         return response("{ \"number\": {$num} }", Response::HTTP_OK);
     }

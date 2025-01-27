@@ -14,7 +14,7 @@ class SampleOctaneCacheDriverController extends Controller
 
     public function index(): Response
     {
-        Cache::store('octane')->forever("getNumber", $this->service->getNumber());
+        Cache::store('octane')->forever("getNumber", $this->service->get_number());
         $num = Cache::store('octane')->get("getNumber", "-1");
         return response("{ \"number\": {$num} }", Response::HTTP_OK);
     }
