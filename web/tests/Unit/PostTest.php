@@ -95,8 +95,10 @@ class PostTest extends TestCase
             'title' => 'Normal Post #2',
             'content' => 'This is a normal post #2.',
         ]);
+
         $posts = DB::connection("mysql")->table("posts")->get();
         $this->assertEquals(2, $posts->count());
+        DB::disconnect('mysql');
 
         DB::connection("mst")->table("posts")->upsert([
             [
@@ -121,7 +123,7 @@ class PostTest extends TestCase
                 'content' => 'This is an upsert post #4.',
             ],
         ], ['id'], ['title', 'content']);
-        
+
         $posts = DB::connection("mysql")->table("posts")->get();
         $this->assertEquals(4, $posts->count());
         $this->assertEquals('Upsert Post #1', $posts[0]->title);
