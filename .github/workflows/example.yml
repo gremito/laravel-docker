@@ -23,22 +23,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: check variables
+      # - name: check variables
+      #   run: |
+      #     echo "server_env: ${{ github.event.inputs.server_env }}"
+      #     echo "SERVER_ENV: ${{ env.SERVER_ENV }}"
+
+      - name: check dev env
+        if: env.SERVER_ENV == 'develop'
         run: |
           echo "server_env: ${{ github.event.inputs.server_env }}"
           echo "SERVER_ENV: ${{ env.SERVER_ENV }}"
 
-      - name: check dev env
-        if: ${{ env.SERVER_ENV }} == 'develop'
-        run: |
-          echo "server_env: develop"
-
       - name: check stg env
-        if: ${{ env.SERVER_ENV }} == 'staging'
+        if: env.SERVER_ENV == 'staging'
         run: |
-          echo "server_env: staging"
+          echo "server_env: ${{ github.event.inputs.server_env }}"
+          echo "SERVER_ENV: ${{ env.SERVER_ENV }}"
 
       - name: check pro env
-        if: ${{ env.SERVER_ENV }} == 'production'
+        if: env.SERVER_ENV == 'production'
         run: |
-          echo "server_env: production"
+          echo "server_env: ${{ github.event.inputs.server_env }}"
+          echo "SERVER_ENV: ${{ env.SERVER_ENV }}"
