@@ -12,8 +12,8 @@ on:
           - "staging"
           - "production"
 
-env:
-  SERVER_ENV: ${{ github.event.inputs.server_env }}
+# env:
+#   SERVER_ENV: ${{ github.event.inputs.server_env }}
 
 jobs:
   build:
@@ -29,19 +29,22 @@ jobs:
       #     echo "SERVER_ENV: ${{ env.SERVER_ENV }}"
 
       - name: check dev env
-        if: env.SERVER_ENV == 'develop'
+        if: github.event.inputs.server_env == 'develop'
+        # if: env.SERVER_ENV == 'develop'
         run: |
           echo "server_env: ${{ github.event.inputs.server_env }}"
-          echo "SERVER_ENV: ${{ env.SERVER_ENV }}"
+          # echo "SERVER_ENV: ${{ env.SERVER_ENV }}"
 
       - name: check stg env
-        if: env.SERVER_ENV == 'staging'
+        if: github.event.inputs.server_env == 'staging'
+        # if: env.SERVER_ENV == 'staging'
         run: |
           echo "server_env: ${{ github.event.inputs.server_env }}"
-          echo "SERVER_ENV: ${{ env.SERVER_ENV }}"
+          # echo "SERVER_ENV: ${{ env.SERVER_ENV }}"
 
       - name: check pro env
-        if: env.SERVER_ENV == 'production'
+        if: github.event.inputs.server_env == 'production'
+        # if: env.SERVER_ENV == 'production'
         run: |
           echo "server_env: ${{ github.event.inputs.server_env }}"
-          echo "SERVER_ENV: ${{ env.SERVER_ENV }}"
+          # echo "SERVER_ENV: ${{ env.SERVER_ENV }}"
