@@ -12,6 +12,9 @@ on:
           - "staging"
           - "production"
 
+env:
+  SERVER_ENV: ${{ github.event.inputs.server_env }}
+
 jobs:
   build:
     name: "Check Params"
@@ -23,18 +26,19 @@ jobs:
       - name: check variables
         run: |
           echo "server_env: ${{ github.event.inputs.server_env }}"
+          echo "SERVER_ENV: ${{ env.SERVER_ENV }}"
 
       - name: check dev env
-        if: ${{ github.event.inputs.server_env }} == 'develop'
+        if: ${{ env.SERVER_ENV }} == 'develop'
         run: |
           echo "server_env: develop"
 
       - name: check stg env
-        if: ${{ github.event.inputs.server_env }} == 'staging'
+        if: ${{ env.SERVER_ENV }} == 'staging'
         run: |
           echo "server_env: staging"
 
       - name: check pro env
-        if: ${{ github.event.inputs.server_env }} == 'production'
+        if: ${{ env.SERVER_ENV }} == 'production'
         run: |
           echo "server_env: production"
