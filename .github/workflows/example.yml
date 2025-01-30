@@ -1,0 +1,40 @@
+name: "サンプル"
+
+on:
+  workflow_dispatch:
+    inputs:
+      server_env: 
+        description: "環境選択"
+        type: choice
+        required: true
+        options: 
+          - "develop"
+          - "staging"
+          - "production"
+
+jobs:
+  build:
+    name: "Check Params"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: check variables
+        run: |
+          echo "server_env: ${{ github.event.inputs.server_env }}"
+
+      - name: check dev env
+        if: ${{ github.event.inputs.server_env }} == 'develop'
+        run: |
+          echo "server_env: develop"
+
+      - name: check stg env
+        if: ${{ github.event.inputs.server_env }} == 'staging'
+        run: |
+          echo "server_env: staging"
+
+      - name: check pro env
+        if: ${{ github.event.inputs.server_env }} == 'production'
+        run: |
+          echo "server_env: production"
