@@ -57,7 +57,7 @@ jobs:
 
       - name: Check Docker Compose services
         run: |
-          services=$(docker-compose ps -q)
+          services=$(docker compose ps -q)
           for service in $services; do
             status=$(docker inspect -f '{{.State.Status}}' $service)
             if [ "$status" != "running" ]; then
