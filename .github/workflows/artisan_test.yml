@@ -52,8 +52,10 @@ jobs:
           for service in $services; do
             status=$(docker inspect -f '{{.State.Status}}' $service)
             if [ "$status" != "running" ]; then
-              echo "Service $service is not running."
+              echo "##### Service $service is not running. #####"
               exit 1
+            else
+              echo "Service $service is running...."
             fi
           done
 
@@ -68,6 +70,10 @@ jobs:
 
       - name: Exec Test
         run: |
+          echo "====== docker compose logs ======"
+          docker compose logs
+
+          echo "====== docker compose exec -T php-apache bash -c 'php artisan test --stop-on-failure --coverage' ======"
           docker compose exec -T php-apache bash -c "php artisan test --stop-on-failure --coverage"
 
       - name: Shut down Docker Compose

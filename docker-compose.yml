@@ -11,7 +11,7 @@ services:
     volumes:
       - ./web:/var/www/laravel
     depends_on:
-      - db
+      - mysql
       - redis
 
   nginx:
@@ -25,7 +25,7 @@ services:
     depends_on: 
       - app
 
-  db:
+  mysql:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: root

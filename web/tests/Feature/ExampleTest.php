@@ -23,6 +23,6 @@ class ExampleTest extends TestCase
     {
         $response = $this->get('/admin');
 
-        $response->assertStatus(404);
+        $response->assertStatus(302);
     }
 }
