@@ -1,4 +1,4 @@
-name: "php artisan test"
+name: "octane artisan test"
 
 on:
   pull_request:
