@@ -90,7 +90,8 @@ RUN pecl install redis \
 RUN pecl install apcu \
   && docker-php-ext-enable apcu
 
-RUN pecl install xdebug 
+RUN pecl install xdebug \
+  && docker-php-ext-enable xdebug
 
 COPY ./php.ini /usr/local/etc/php/
 COPY ./xdebug.ini /usr/local/etc/php/
@@ -102,6 +103,12 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 COPY --from=composer:2.4 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/laravel
+
+# Octane Options
+ARG OCTANE_WORKERS
+ENV OCTANE_WORKERS=$OCTANE_WORKERS
+ARG OCTANE_MAX_REQUESTS
+ENV OCTANE_MAX_REQUESTS=$OCTANE_MAX_REQUESTS
 
 COPY ./entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
