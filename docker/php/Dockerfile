@@ -105,6 +105,8 @@ COPY --from=composer:2.4 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/laravel
 
 # Octane Options
+ARG OCTANE_HTTPS
+ENV OCTANE_HTTPS=$OCTANE_HTTPS
 ARG OCTANE_WORKERS
 ENV OCTANE_WORKERS=$OCTANE_WORKERS
 ARG OCTANE_MAX_REQUESTS

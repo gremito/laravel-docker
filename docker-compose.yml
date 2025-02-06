@@ -5,6 +5,7 @@ services:
     build:
       context: ./docker/php
       args:
+          OCTANE_HTTPS: ${OCTANE_HTTPS:-false}
           OCTANE_WORKERS: ${OCTANE_WORKERS:-1}
           OCTANE_MAX_REQUESTS: ${OCTANE_MAX_REQUESTS:-1}
     volumes:
