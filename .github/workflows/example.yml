@@ -23,10 +23,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # - name: check variables
-      #   run: |
-      #     echo "server_env: ${{ github.event.inputs.server_env }}"
-      #     echo "SERVER_ENV: ${{ env.SERVER_ENV }}"
+      - name: init variables
+        id: init-variables
+        run: |
+          echo "inputs server_env: ${{ github.event.inputs.server_env }}"
+          echo "SERVER_ENV=${{ github.event.inputs.server_env || 'not env'}}" >> $GITHUB_OUTPUT
+          echo "SERVER_ENV=${{ github.event.inputs.server_env || 'not env'}}" >> $GITHUB_ENV
+          echo "env.SERVER_ENV: ${{ env.SERVER_ENV }}"
+          echo "steps.init-variables.outputs.SERVER_ENV: ${{ steps.init-variables.outputs.SERVER_ENV }}"
+
+      - name: check variables
+        id: check-variables
+        run: |
+          echo "env.SERVER_ENV: ${{ env.SERVER_ENV }}"
+          echo "steps.init-variables.outputs.SERVER_ENV: ${{ steps.init-variables.outputs.SERVER_ENV }}"
 
       - name: check dev env
         if: github.event.inputs.server_env == 'develop'
