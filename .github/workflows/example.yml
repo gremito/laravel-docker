@@ -37,7 +37,7 @@ jobs:
         id: init-variables
         run: |
           echo "inputs server_env: ${{ github.event.inputs.server_env }}"
-          echo "inputs version_env: ${{ github.event.inputs.version_env }}"
+          echo "inputs server_version: ${{ github.event.inputs.server_version }}"
           echo "SERVER_ENV=${{ github.event.inputs.server_env || 'not env'}}" >> $GITHUB_OUTPUT
           echo "SERVER_ENV=${{ github.event.inputs.server_env || 'not env'}}" >> $GITHUB_ENV
           echo "env.SERVER_ENV: ${{ env.SERVER_ENV }}"
@@ -47,7 +47,7 @@ jobs:
         id: check-variables
         run: |
           echo "inputs server_env: ${{ github.event.inputs.server_env }}"
-          echo "inputs version_env: ${{ github.event.inputs.version_env }}"
+          echo "inputs server_version: ${{ github.event.inputs.server_version }}"
           echo "env.SERVER_ENV: ${{ env.SERVER_ENV }}"
           echo "steps.init-variables.outputs.SERVER_ENV: ${{ steps.init-variables.outputs.SERVER_ENV }}"
 
