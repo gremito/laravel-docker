@@ -9,7 +9,7 @@ on:
         description: "環境選択"
         type: choice
         required: true
-        default: "develop"
+        default: "staging"
         options: 
           - "develop"
           - "staging"
