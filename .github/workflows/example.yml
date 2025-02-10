@@ -16,6 +16,7 @@ on:
         description: "バージョン選択"
         type: choice
         required: true
+        default: "v1.0.0"
         options: 
           - "v1.0.0"
           - "v1.0.1"
