@@ -7,6 +7,7 @@ on:
         description: "環境選択"
         type: choice
         required: true
+        default: "develop"
         options: 
           - "develop"
           - "staging"
@@ -35,6 +36,7 @@ jobs:
       - name: check variables
         id: check-variables
         run: |
+          echo "inputs server_env: ${{ github.event.inputs.server_env }}"
           echo "env.SERVER_ENV: ${{ env.SERVER_ENV }}"
           echo "steps.init-variables.outputs.SERVER_ENV: ${{ steps.init-variables.outputs.SERVER_ENV }}"
 
