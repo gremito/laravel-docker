@@ -13,8 +13,10 @@
 /storage/*.key
 /vendor
 auth.json
+composer-checksum
 coverage.xml
 Homestead.json
 Homestead.yaml
 npm-debug.log
+rr
 yarn-error.log

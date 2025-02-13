@@ -115,3 +115,14 @@ ENV OCTANE_MAX_REQUESTS=$OCTANE_MAX_REQUESTS
 COPY ./entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+CMD bash -c ' \
+  SET_OPTION=""; \
+  if [ -n "${OCTANE_WORKERS}" ]; then \
+    SET_OPTION="${SET_OPTION} --workers=${OCTANE_WORKERS}"; \
+  fi; \
+  if [ -n "${OCTANE_MAX_REQUESTS}" ]; then \
+    SET_OPTION="${SET_OPTION} --max-requests=${OCTANE_MAX_REQUESTS}"; \
+  fi; \
+  php artisan octane:start --no-interaction --server=roadrunner --rpc-port=6001 --host=0.0.0.0 --port=80${SET_OPTION} \
+'
