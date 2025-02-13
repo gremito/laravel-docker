@@ -1,0 +1,185 @@
+name: Test Docker Composer Install & Update
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+jobs:
+  test-composer-behavior:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Compose
+        run: |
+          docker compose up -d
+
+      - name: Check Docker Compose services
+        run: |
+          echo "===== Check Docker Compose services ====="
+          services=$(docker compose ps -q)
+          for service in $services; do
+            status=$(docker inspect -f '{{.State.Status}}' $service)
+            if [ "$status" != "running" ]; then
+              echo "##### Service $service is not running. #####"
+              exit 1
+            else
+              echo "Service $service is running...."
+            fi
+          done
+
+          echo "===== Check Octane Server Running ====="
+          RETRY_LIMIT=10
+          retry_count=0
+          while (( retry_count < RETRY_LIMIT )); do
+            if docker compose logs | grep -q "INFO  Server running..."; then
+              retry_count=$((RETRY_LIMIT + 1))
+            else
+              retry_count=$((retry_count + 1))
+              echo "Waiting for Octane server to start... ($retry_count/$RETRY_LIMIT)"
+              sleep 30
+            fi
+          done
+          if (( retry_count >= RETRY_LIMIT )); then
+            echo "===== docker compose logs ====="
+            docker compose logs
+          fi
+          if docker compose logs | grep "ERROR.*\s.*should not be empty"; then
+            echo "===== cat web/storage/logs/laravel.log ====="
+            cat web/storage/logs/laravel.log
+          fi
+
+      # --- 初回起動時のテスト ---
+      - name: Check first time composer install
+        run: |
+          docker compose logs app > output.log
+          if grep -q "composer install" output.log; then
+            echo "✅ 初回 composer install 実行成功"
+          else
+            echo "❌ 初回 composer install が実行されませんでした。"
+            cat output.log
+            exit 1
+          fi
+
+      - name: Clean up
+        run: docker compose down
+
+      # --- composer.json と composer.lock の両方を変更した場合のテスト ---
+      - name: Modify composer.json (change description) and composer.lock (_readme)
+        run: |
+          jq '.description = "Updated description for testing"' composer.json > temp.json && mv temp.json composer.json
+          jq '._readme = ["Updated _readme content for testing"]' composer.lock > temp.lock && mv temp.lock composer.lock
+
+      - name: Restart Docker Compose (both composer.json & composer.lock changed)
+        run: |
+          docker compose up -d --build
+
+      - name: Check Docker Compose services
+        run: |
+          echo "===== Check Docker Compose services ====="
+          services=$(docker compose ps -q)
+          for service in $services; do
+            status=$(docker inspect -f '{{.State.Status}}' $service)
+            if [ "$status" != "running" ]; then
+              echo "##### Service $service is not running. #####"
+              exit 1
+            else
+              echo "Service $service is running...."
+            fi
+          done
+
+          echo "===== Check Octane Server Running ====="
+          RETRY_LIMIT=10
+          retry_count=0
+          while (( retry_count < RETRY_LIMIT )); do
+            if docker compose logs | grep -q "INFO  Server running..."; then
+              retry_count=$((RETRY_LIMIT + 1))
+            else
+              retry_count=$((retry_count + 1))
+              echo "Waiting for Octane server to start... ($retry_count/$RETRY_LIMIT)"
+              sleep 30
+            fi
+          done
+          if (( retry_count >= RETRY_LIMIT )); then
+            echo "===== docker compose logs ====="
+            docker compose logs
+          fi
+          if docker compose logs | grep "ERROR.*\s.*should not be empty"; then
+            echo "===== cat web/storage/logs/laravel.log ====="
+            cat web/storage/logs/laravel.log
+          fi
+
+      - name: Check composer install after modifying both files
+        run: |
+          docker compose logs app > output.log
+          if grep -q "composer install" output.log; then
+            echo "✅ composer.json & composer.lock 変更時の composer install 実行成功"
+          else
+            echo "❌ composer install が実行されませんでした。"
+            cat output.log
+            exit 1
+          fi
+
+      - name: Clean up
+        run: docker compose down
+
+      # --- composer.json のみ変更した場合のテスト ---
+      - name: Modify only composer.json (upgrade PHP to 8.2)
+        run: |
+          jq '.require.php = "^8.2"' composer.json > temp.json && mv temp.json composer.json
+
+      - name: Restart Docker Compose (only composer.json changed)
+        run: |
+          docker compose up -d --build
+
+      - name: Check Docker Compose services
+        run: |
+          echo "===== Check Docker Compose services ====="
+          services=$(docker compose ps -q)
+          for service in $services; do
+            status=$(docker inspect -f '{{.State.Status}}' $service)
+            if [ "$status" != "running" ]; then
+              echo "##### Service $service is not running. #####"
+              exit 1
+            else
+              echo "Service $service is running...."
+            fi
+          done
+
+          echo "===== Check Octane Server Running ====="
+          RETRY_LIMIT=10
+          retry_count=0
+          while (( retry_count < RETRY_LIMIT )); do
+            if docker compose logs | grep -q "INFO  Server running..."; then
+              retry_count=$((RETRY_LIMIT + 1))
+            else
+              retry_count=$((retry_count + 1))
+              echo "Waiting for Octane server to start... ($retry_count/$RETRY_LIMIT)"
+              sleep 30
+            fi
+          done
+          if (( retry_count >= RETRY_LIMIT )); then
+            echo "===== docker compose logs ====="
+            docker compose logs
+          fi
+          if docker compose logs | grep "ERROR.*\s.*should not be empty"; then
+            echo "===== cat web/storage/logs/laravel.log ====="
+            cat web/storage/logs/laravel.log
+          fi
+
+      - name: Check composer update after modifying only composer.json
+        run: |
+          docker compose logs app > output.log
+          if grep -q "composer update" output.log; then
+            echo "✅ composer.json のみ変更時の composer update 実行成功"
+          else
+            echo "❌ composer update が実行されませんでした。"
+            cat output.log
+            exit 1
+          fi
+
+      - name: Clean up
+        run: docker compose down

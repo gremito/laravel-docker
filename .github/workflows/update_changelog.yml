@@ -1,0 +1,128 @@
+name: Update CHANGELOG on PR
+
+on:
+  pull_request:
+    types: [opened, reopened]
+    paths:
+      - 'libs/**'
+  workflow_dispatch:
+    inputs:
+      pr_title:
+        type: string
+        description: "PRタイトル"
+        default: 'TESTタイトル'
+      pr_number:
+        type: string
+        description: "PR番号"
+        default: 'xxx'
+
+jobs:
+  update-changelog:
+    if: ${{ github.base_ref != 'main' && github.head_ref != 'develop' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: コードのチェックアウト
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+
+      - name: Get list of modified projects
+        id: get_projects
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        run: |
+          # 変更情報取得
+          if [[ "${{ github.event_name }}" == 'workflow_dispatch' ]]; then
+            CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }})
+            PROJECTS=$(echo "$CHANGED_FILES" | grep -o '^libs/[^/]*/' | sort | uniq)
+          else
+            PROJECTS=$(echo ${ALL_CHANGED_FILES} | grep -o '^libs/[^/]*/' | sort | uniq)
+          fi
+          echo "Projects: $PROJECTS"
+          echo "PROJECTS=${PROJECTS}" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Update CHANGELOG for each project
+        if: ${{ steps.get_projects.outputs.projects != '' }}
+        run: |
+          escape_regex() {
+              local input="$1"
+              echo "$input" | sed 's/[]\.[*^$(){}+?|]/\\&/g'
+          }
+
+          # 変更情報をもとにPR情報を取得して`CHANGELOGS.md`に追記
+          for PROJECT in ${{ steps.get_projects.outputs.projects }}; do
+            if [[ "${{ github.event_name }}" != 'workflow_dispatch' ]]; then
+              PR_TITLE="${{ github.event.pull_request.title }}"
+              PR_NUMBER="${{ github.event.pull_request.number }}"
+            else
+              PR_TITLE="${{ inputs.pr_title }}"
+              PR_NUMBER="${{ inputs.pr_number }}"
+            fi
+            echo "PR_TITLE: ${PR_TITLE}"
+            echo "PR_NUMBER: ${PR_NUMBER}"
+
+            CHANGELOG_FILE="${PROJECT}CHANGELOGS.md"
+            if [ ! -e $CHANGELOG_FILE ]; then
+              echo "Create CHANGELOGS.md"
+              echo "# CHANGELOGS
+
+          本ディレクトリ以下の修正について記載します。
+          マージ後に、関連するPRを記載してきます。
+          " > $CHANGELOG_FILE
+            fi
+
+            ADD_CHANGE_LOG="- $PR_TITLE #$PR_NUMBER"
+            echo "CHANGELOG_FILE: ${CHANGELOG_FILE}"
+            echo "ADD_CHANGE_LOG: ${ADD_CHANGE_LOG}"
+
+            ESCAPED_SEARCH_STRING=$(escape_regex "$ADD_CHANGE_LOG")
+
+            if grep -n "^$ESCAPED_SEARCH_STRING" $CHANGELOG_FILE; then
+              echo "すでに「${ADD_CHANGE_LOG}」が記載されているためスキップ"
+              continue
+            fi
+
+            DATE=$(date +'%Y/%m/%d')
+            LINE_NUM=6
+            if grep -q "^## $DATE" $CHANGELOG_FILE; then
+              LINE_NUM=$(grep -n "^## $DATE" $CHANGELOG_FILE | cut -d: -f1)
+              LINE_NUM=$((LINE_NUM + 1))
+            else
+              ADD_CHANGE_LOG="## ${DATE}
+          ${ADD_CHANGE_LOG}
+          "
+            fi
+
+            TEMP_FILE=$(mktemp)
+            head -n $((LINE_NUM - 1)) $CHANGELOG_FILE > $TEMP_FILE
+            echo -e "${ADD_CHANGE_LOG}" >> $TEMP_FILE
+            tail -n +$LINE_NUM $CHANGELOG_FILE >> $TEMP_FILE
+            mv $TEMP_FILE $CHANGELOG_FILE
+
+            # Commit changes if not manually triggered
+            if [[ "${{ github.event_name }}" != 'workflow_dispatch' ]]; then
+              git status
+              git diff
+              git add $CHANGELOG_FILE
+              git commit -m "Update CHANGELOG for PR #${PR_NUMBER} in ${PROJECT}"
+            fi
+          done
+        shell: bash
+
+      - name: Push changes
+        if: ${{ github.event_name != 'workflow_dispatch' && steps.get_projects.outputs.projects != '' }}
+        run: |
+          # PR情報からマージもとのブランチを取得して`CHANGELOGS.md`のコミットをプッシュ
+          BRANCH=${{ github.event.pull_request.head.ref }}
+          git push origin HEAD:$BRANCH

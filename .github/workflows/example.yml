@@ -1,0 +1,62 @@
+name: "サンプル"
+
+on:
+  workflow_dispatch:
+    inputs:
+      server_env: 
+        description: "環境選択"
+        type: choice
+        required: true
+        default: "develop"
+        options: 
+          - "develop"
+          - "staging"
+          - "production"
+
+# env:
+#   SERVER_ENV: ${{ github.event.inputs.server_env }}
+
+jobs:
+  build:
+    name: "Check Params"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: init variables
+        id: init-variables
+        run: |
+          echo "inputs server_env: ${{ github.event.inputs.server_env }}"
+          echo "SERVER_ENV=${{ github.event.inputs.server_env || 'not env'}}" >> $GITHUB_OUTPUT
+          echo "SERVER_ENV=${{ github.event.inputs.server_env || 'not env'}}" >> $GITHUB_ENV
+          echo "env.SERVER_ENV: ${{ env.SERVER_ENV }}"
+          echo "steps.init-variables.outputs.SERVER_ENV: ${{ steps.init-variables.outputs.SERVER_ENV }}"
+
+      - name: check variables
+        id: check-variables
+        run: |
+          echo "inputs server_env: ${{ github.event.inputs.server_env }}"
+          echo "env.SERVER_ENV: ${{ env.SERVER_ENV }}"
+          echo "steps.init-variables.outputs.SERVER_ENV: ${{ steps.init-variables.outputs.SERVER_ENV }}"
+
+      - name: check dev env
+        if: github.event.inputs.server_env == 'develop'
+        # if: env.SERVER_ENV == 'develop'
+        run: |
+          echo "server_env: ${{ github.event.inputs.server_env }}"
+          # echo "SERVER_ENV: ${{ env.SERVER_ENV }}"
+
+      - name: check stg env
+        if: github.event.inputs.server_env == 'staging'
+        # if: env.SERVER_ENV == 'staging'
+        run: |
+          echo "server_env: ${{ github.event.inputs.server_env }}"
+          # echo "SERVER_ENV: ${{ env.SERVER_ENV }}"
+
+      - name: check pro env
+        if: github.event.inputs.server_env == 'production'
+        # if: env.SERVER_ENV == 'production'
+        run: |
+          echo "server_env: ${{ github.event.inputs.server_env }}"
+          # echo "SERVER_ENV: ${{ env.SERVER_ENV }}"

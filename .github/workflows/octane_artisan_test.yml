@@ -1,0 +1,160 @@
+name: "octane artisan test"
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      OCTANE_ENV: 
+        description: "Octane環境選択"
+        type: choice
+        default: "octane-roadrunner"
+        required: true
+        options: 
+          - "octane-roadrunner"
+          - "octane-swoole"
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+jobs:
+  build:
+    if: github.event.pull_request.draft == false
+    name: "Run Test"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.OCTANE_ENV }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker-container
+          install: true
+          use: true
+          cache-binary: true
+
+      - name: Cache Primes
+        id: cache-primes
+        uses: actions/cache@v4
+        with:
+          path: prime-numbers
+          key: ${{ runner.os }}-primes
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      # - name: Login to DockerHub
+      #   uses: docker/login-action@v1
+      #   with:
+      #     username: ${{ secrets.DOCKER_USERNAME }}
+      #     password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Init .env file
+        run: |
+          case "${{ github.event.inputs.OCTANE_ENV }}" in
+            octane-swoole) OCTANE_SERVER="swoole" ;;
+            octane-roadrunner) OCTANE_SERVER="roadrunner" ;;
+          esac
+          sed -i "s/^OCTANE_SERVER=.*/OCTANE_SERVER=${OCTANE_SERVER}/" web/.env.example
+          cp web/.env.example web/.env
+          octane_server_type=$(grep '^OCTANE_SERVER=' web/.env.example | cut -d '=' -f2-)
+          echo "octane_server_type: ${octane_server_type}"
+
+      - name: Run Docker Compose
+        run: |
+          docker compose up -d --build
+
+      - name: Check Docker Compose services
+        run: |
+          echo "===== Check Docker Compose services ====="
+          services=$(docker compose ps -q)
+          for service in $services; do
+            status=$(docker inspect -f '{{.State.Status}}' $service)
+            if [ "$status" != "running" ]; then
+              echo "##### Service $service is not running. #####"
+              exit 1
+            else
+              echo "Service $service is running...."
+            fi
+          done
+
+          echo "===== Check Octane Server Running ====="
+          RETRY_LIMIT=10
+          retry_count=0
+          while (( retry_count < RETRY_LIMIT )); do
+            if docker compose logs | grep -q "INFO  Server running..."; then
+              retry_count=$((RETRY_LIMIT + 1))
+            else
+              retry_count=$((retry_count + 1))
+              echo "Waiting for Octane server to start... ($retry_count/$RETRY_LIMIT)"
+              sleep 30
+            fi
+          done
+          if (( retry_count >= RETRY_LIMIT )); then
+            echo "===== docker compose logs ====="
+            docker compose logs
+          fi
+
+      - name: Setup Laravel App
+        run: |
+          docker exec docker-for-laravel-app-1 bash -c "php artisan migrate"
+          docker exec docker-for-laravel-app-1 bash -c "php artisan migrate --env=testing"
+          docker exec docker-for-laravel-app-1 bash -c "php artisan db:seed"
+          docker exec docker-for-laravel-app-1 bash -c "php artisan db:seed --env=testing"
+
+      - name: Exec Test
+        run: |
+          echo "====== php artisan test --stop-on-failure --coverage ======"
+          docker exec docker-for-laravel-app-1 bash -c "php artisan test --stop-on-failure --coverage"
+
+      - name: Shut down Docker Compose
+        if: always()
+        run: |
+          docker compose down
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: ./web/coverage/coverage.xml
+
+      # - name: Action Slack Notify
+      #   # Pick up events even if the job fails or is canceled.
+      #   if: always()
+      #   uses: 8398a7/action-slack@v3
+      #   with:
+      #     status: ${{ job.status }}
+      #     fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest # selectable (default: repo,message)
+
+      - name: Send GitHub Action trigger data to Slack workflow
+        id: slack
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "text": ":github: ビルド結果: ${{ job.status }}\n\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ":github: ビルド結果: ${{ job.status }}\n\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+                  }
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "Author: <https://github.com/${{ github.event.sender.login }}|@${{ github.event.sender.login }}>"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

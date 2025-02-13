@@ -2,7 +2,7 @@ name: "php artisan test"
 
 on:
   pull_request:
-    types: [opened, reopened]
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
 
 env:
@@ -11,24 +11,27 @@ env:
 
 jobs:
   build:
+    if: github.event.pull_request.draft == false
     name: "Run Test"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Cache Docker layers
-        uses: actions/cache@v2
+        uses: docker/setup-buildx-action@v3
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
+          driver: docker-container
+          install: true
+          use: true
+          cache-binary: true
+
+      - name: Cache Primes
+        id: cache-primes
+        uses: actions/cache@v4
+        with:
+          path: prime-numbers
+          key: ${{ runner.os }}-primes
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -41,16 +44,18 @@ jobs:
 
       - name: Run Docker Compose
         run: |
-          docker-compose up -d --build
+          docker compose up -d --build
 
       - name: Check Docker Compose services
         run: |
-          services=$(docker-compose ps -q)
+          services=$(docker compose ps -q)
           for service in $services; do
             status=$(docker inspect -f '{{.State.Status}}' $service)
             if [ "$status" != "running" ]; then
-              echo "Service $service is not running."
+              echo "##### Service $service is not running. #####"
               exit 1
+            else
+              echo "Service $service is running...."
             fi
           done
 
@@ -65,6 +70,10 @@ jobs:
 
       - name: Exec Test
         run: |
+          echo "====== docker compose logs ======"
+          docker compose logs
+
+          echo "====== docker compose exec -T php-apache bash -c 'php artisan test --stop-on-failure --coverage' ======"
           docker compose exec -T php-apache bash -c "php artisan test --stop-on-failure --coverage"
 
       - name: Shut down Docker Compose
@@ -73,7 +82,7 @@ jobs:
           docker compose down
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: ./web/coverage/coverage.xml
