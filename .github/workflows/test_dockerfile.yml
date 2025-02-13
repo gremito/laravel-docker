@@ -43,10 +43,10 @@ jobs:
               sleep 30
             fi
           done
-          # if (( retry_count >= RETRY_LIMIT )); then
-          #   echo "===== docker compose logs ====="
-          #   docker compose logs
-          # fi
+          if (( retry_count >= RETRY_LIMIT )); then
+            echo "===== docker compose logs ====="
+            docker compose logs
+          fi
           if docker compose logs | grep "ERROR.*\s.*should not be empty"; then
             echo "===== cat web/storage/logs/laravel.log ====="
             cat web/storage/logs/laravel.log
@@ -59,7 +59,9 @@ jobs:
           if grep -q "composer install" output.log; then
             echo "✅ 初回 composer install 実行成功"
           else
-            echo "❌ 初回 composer install が実行されませんでした。" && exit 1
+            echo "❌ 初回 composer install が実行されませんでした。"
+            cat output.log
+            exit 1
           fi
 
       - name: Clean up
@@ -101,10 +103,10 @@ jobs:
               sleep 30
             fi
           done
-          # if (( retry_count >= RETRY_LIMIT )); then
-          #   echo "===== docker compose logs ====="
-          #   docker compose logs
-          # fi
+          if (( retry_count >= RETRY_LIMIT )); then
+            echo "===== docker compose logs ====="
+            docker compose logs
+          fi
           if docker compose logs | grep "ERROR.*\s.*should not be empty"; then
             echo "===== cat web/storage/logs/laravel.log ====="
             cat web/storage/logs/laravel.log
@@ -116,7 +118,9 @@ jobs:
           if grep -q "composer install" output.log; then
             echo "✅ composer.json & composer.lock 変更時の composer install 実行成功"
           else
-            echo "❌ composer install が実行されませんでした。" && exit 1
+            echo "❌ composer install が実行されませんでした。"
+            cat output.log
+            exit 1
           fi
 
       - name: Clean up
@@ -157,10 +161,10 @@ jobs:
               sleep 30
             fi
           done
-          # if (( retry_count >= RETRY_LIMIT )); then
-          #   echo "===== docker compose logs ====="
-          #   docker compose logs
-          # fi
+          if (( retry_count >= RETRY_LIMIT )); then
+            echo "===== docker compose logs ====="
+            docker compose logs
+          fi
           if docker compose logs | grep "ERROR.*\s.*should not be empty"; then
             echo "===== cat web/storage/logs/laravel.log ====="
             cat web/storage/logs/laravel.log
@@ -172,7 +176,9 @@ jobs:
           if grep -q "composer update" output.log; then
             echo "✅ composer.json のみ変更時の composer update 実行成功"
           else
-            echo "❌ composer update が実行されませんでした。" && exit 1
+            echo "❌ composer update が実行されませんでした。"
+            cat output.log
+            exit 1
           fi
 
       - name: Clean up
